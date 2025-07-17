@@ -32,14 +32,10 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user) {
-          // Pas trouvé
           return null;
         }
-
-        // Vérifie que le mot de passe saisi correspond au hash stocké
         const isValidPassword = await bcrypt.compare(credentials.password, user.password);
         if (!isValidPassword) {
-          // Mot de passe incorrect
           return null;
         }
 

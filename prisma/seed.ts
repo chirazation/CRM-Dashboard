@@ -1,6 +1,6 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient(); 
 
 const userData: Prisma.UserCreateInput[] = [
   {
@@ -15,10 +15,18 @@ const userData: Prisma.UserCreateInput[] = [
   },
 ];
 
-export async function main() {
+async function main() {
   for (const u of userData) {
     await prisma.user.create({ data: u });
   }
 }
 
-main(); 
+main()
+  .then(() => {
+    console.log("✅ Seeding completed.");
+    return prisma.$disconnect();
+  })
+  .catch((e) => {
+    console.error("❌ Seeding error:", e);
+    return prisma.$disconnect();
+  });

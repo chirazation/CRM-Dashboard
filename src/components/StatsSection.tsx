@@ -68,7 +68,7 @@ const StatItem = ({
 
 export const StatsSection = () => {
   return (
-    <section className="w-full bg-gray-100 py-20 px-4">
+    <section className=" bg-gray-100 py-20 px-4 min-w-full">
       <div className="max-w-screen-xl mx-auto flex flex-wrap justify-center gap-6">
         <StatItem label="Utilisateurs actifs" value={5200} color="text-blue-600" />
         <StatItem label="Taux de disponibilité (%)" value={99} color="text-green-600" />

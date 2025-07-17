@@ -31,7 +31,7 @@ export default function SignIn() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-[#0a1f44] px-4">
+    <div className="h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="p-8 bg-white rounded-3xl shadow-xl w-full max-w-md space-y-6">
         <h1 className="text-3xl font-extrabold text-[#0a1f44] text-center">Sign In</h1>
 
@@ -113,7 +113,7 @@ export default function SignIn() {
 
         {/* Google Sign In */}
         <button
-          onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+          onClick={() => signIn('google', { callbackUrl: '/dashboardgrand' })}
           className="w-full py-3 border border-gray-300 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-100 transition"
         >
           <Icon icon="flat-color-icons:google" width="24" height="24" />

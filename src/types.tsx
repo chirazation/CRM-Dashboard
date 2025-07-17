@@ -1,9 +1,7 @@
-import { JSX } from "react";
-
-export type SideNavItem = {
+export interface SideNavItem {
   title: string;
   path: string;
-  icon?: JSX.Element;
-  submenu?: boolean;
+  icon?: string; 
   subMenuItems?: SideNavItem[];
-};
+   submenu?: boolean; 
+}

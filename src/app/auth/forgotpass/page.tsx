@@ -18,15 +18,14 @@ export default function ForgotPassword() {
       return;
     }
 
-    // TODO: Connect to your API
-    // await fetch('/api/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+    
 
     setMessage(`If an account with ${email} exists, a password reset link has been sent.`);
     setEmail('');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a1f44] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-center text-[#0a1f44]">
           Forgot Password

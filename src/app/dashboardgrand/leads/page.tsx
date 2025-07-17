@@ -1,25 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Icon } from '@iconify/react';
 
 type Lead = {
   id: string;
   name: string;
   email: string;
-  phone?: string;
+  phone: string;
   status: 'New' | 'Contacted' | 'Qualified';
+  assignedTo: number;
+  source?: string;
+  notes?: string;
+  companyId?: number;
 };
 
-const initialLeads: Lead[] = [
-  { id: '1', name: 'Alice Smith', email: 'alice@example.com', phone: '123-456-7890', status: 'New' },
-  { id: '2', name: 'Bob Johnson', email: 'bob@example.com', phone: '555-123-4567', status: 'Contacted' },
-];
-
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Lead>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      const res = await fetch('/api/leads');
+      const data = await res.json();
+      setLeads(data);
+    };
+    fetchLeads();
+  }, []);
 
   const openAddModal = () => {
     setFormData({});
@@ -39,38 +48,59 @@ export default function LeadsPage() {
     setEditingId(null);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === 'assignedTo' || name === 'companyId') {
+      setFormData((prev) => ({ ...prev, [name]: Number(value) }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.status) {
-      alert('Please fill in all fields.');
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.status ||
+      !formData.assignedTo
+    ) {
+      alert('Please fill in all required fields (name, email, phone, status, assignedTo).');
       return;
     }
 
+    const method = editingId ? 'PUT' : 'POST';
+    const url = editingId ? `/api/leads/${editingId}` : '/api/leads';
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    if (!res.ok) {
+      alert('Failed to save lead');
+      return;
+    }
+
+    const savedLead: Lead = await res.json();
+
     if (editingId) {
-      setLeads((prev) =>
-        prev.map((lead) => (lead.id === editingId ? { ...lead, ...formData } as Lead : lead))
-      );
+      setLeads((prev) => prev.map((lead) => (lead.id === editingId ? savedLead : lead)));
     } else {
-      const newLead: Lead = {
-        id: Date.now().toString(),
-        name: formData.name!,
-        email: formData.email!,
-        phone: formData.phone || '',
-        status: formData.status as Lead['status'],
-      };
-      setLeads((prev) => [...prev, newLead]);
+      setLeads((prev) => [...prev, savedLead]);
     }
 
     closeModal();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this lead?')) {
+      await fetch(`/api/leads/${id}`, { method: 'DELETE' });
       setLeads((prev) => prev.filter((lead) => lead.id !== id));
     }
   };
@@ -96,13 +126,17 @@ export default function LeadsPage() {
                 <th className="px-6 py-3 text-left">Email</th>
                 <th className="px-6 py-3 text-left">Phone</th>
                 <th className="px-6 py-3 text-left">Status</th>
+                <th className="px-6 py-3 text-left">Assigned To</th>
+                <th className="px-6 py-3 text-left">Source</th>
+                <th className="px-6 py-3 text-left">Company ID</th>
+                <th className="px-6 py-3 text-left">Notes</th>
                 <th className="px-6 py-3 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {leads.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-6 text-gray-500">
+                  <td colSpan={9} className="text-center py-6 text-gray-500">
                     No leads found.
                   </td>
                 </tr>
@@ -111,7 +145,7 @@ export default function LeadsPage() {
                   <tr key={lead.id} className="border-b hover:bg-gray-50">
                     <td className="px-6 py-4">{lead.name}</td>
                     <td className="px-6 py-4">{lead.email}</td>
-                    <td className="px-6 py-4">{lead.phone || '—'}</td>
+                    <td className="px-6 py-4">{lead.phone}</td>
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -125,18 +159,24 @@ export default function LeadsPage() {
                         {lead.status}
                       </span>
                     </td>
+                    <td className="px-6 py-4">{lead.assignedTo}</td>
+                    <td className="px-6 py-4">{lead.source || '—'}</td>
+                    <td className="px-6 py-4">{lead.companyId ?? '—'}</td>
+                    <td className="px-6 py-4">{lead.notes || '—'}</td>
                     <td className="px-6 py-4 text-center space-x-3">
                       <button
                         onClick={() => openEditModal(lead)}
-                        className="text-[#0a1f44] font-medium hover:underline"
+                        className="text-[#0f7036] hover:text-blue-600 transition"
+                        aria-label="Edit"
                       >
-                        Edit
+                        <Icon icon="mdi:pencil-outline" className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleDelete(lead.id)}
-                        className="text-red-600 font-medium hover:underline"
+                        className="text-red-600 hover:text-red-800 transition"
+                        aria-label="Delete"
                       >
-                        Delete
+                        <Icon icon="mdi:trash-can-outline" className="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
@@ -147,14 +187,13 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Modal */}
       {modalOpen && (
         <div
-          className="fixed inset-0 bg-black/50 flex justify-center items-center z-50"
+          className="fixed inset-0 bg-black/50 flex justify-center items-start overflow-y-auto z-50 py-10 px-4"
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-xl shadow-lg max-w-md w-full p-6"
+            className="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Lead' : 'Add Lead'}</h2>
@@ -170,6 +209,7 @@ export default function LeadsPage() {
                   required
                 />
               </div>
+
               <div>
                 <label className="block font-medium mb-1">Email *</label>
                 <input
@@ -181,16 +221,19 @@ export default function LeadsPage() {
                   required
                 />
               </div>
+
               <div>
-                <label className="block font-medium mb-1">Phone</label>
+                <label className="block font-medium mb-1">Phone *</label>
                 <input
                   type="text"
                   name="phone"
                   value={formData.phone || ''}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  required
                 />
               </div>
+
               <div>
                 <label className="block font-medium mb-1">Status *</label>
                 <select
@@ -206,6 +249,54 @@ export default function LeadsPage() {
                   <option value="Qualified">Qualified</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block font-medium mb-1">Assigned To (User ID) *</label>
+                <input
+                  type="number"
+                  name="assignedTo"
+                  value={formData.assignedTo ?? ''}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  required
+                  min={1}
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium mb-1">Source</label>
+                <input
+                  type="text"
+                  name="source"
+                  value={formData.source || ''}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium mb-1">Company ID</label>
+                <input
+                  type="number"
+                  name="companyId"
+                  value={formData.companyId ?? ''}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  min={1}
+                />
+              </div>
+
+              <div>
+                <label className="block font-medium mb-1">Notes</label>
+                <textarea
+                  name="notes"
+                  value={formData.notes || ''}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  rows={3}
+                />
+              </div>
+
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
