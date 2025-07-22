@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
+import {TunisiaGovernorateSelect} from '@/components/tunisiaselect';
 
 type Company = {
   id: string;
@@ -183,18 +184,15 @@ export default function CompaniesPage() {
                   className="w-full border border-gray-300 rounded-lg px-4 py-2"
                 />
               </div>
-
               <div>
                 <label className="block font-medium mb-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location || ''}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                />
+              <TunisiaGovernorateSelect
+               value={formData.location || ''}
+                onChange={(value:string) =>
+                    setFormData((prev) => ({ ...prev, location: value }))
+                    }
+                 />
               </div>
-
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"

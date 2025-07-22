@@ -1,28 +1,43 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+// Zod Schema
+const schema = z.object({
+  name: z.string().min(2, 'Name is too short'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  role: z.enum(['user', 'admin']),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export default function SignUp() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'user',
-  });
-
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      role: 'user',
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
     setError('');
 
@@ -30,14 +45,14 @@ export default function SignUp() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
       if (res.ok) {
         router.push('/');
       } else {
-        const data = await res.json();
-        setError(data.message || 'An error occurred.');
+        const json = await res.json();
+        setError(json.message || 'An error occurred.');
       }
     } catch {
       setError('Server error. Please try again later.');
@@ -47,11 +62,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className=" flex items-center justify-center bg-gray-100 px-4 ">
+    <div className="flex items-center justify-center bg-gray-100 px-4">
       <div className="p-8 bg-white rounded-3xl shadow-xl w-full max-w-md space-y-6 mt-4 mb-4">
         <h1 className="text-3xl font-extrabold text-[#0a1f44] text-center">Create Account</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-left">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left">
           {/* Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -63,15 +78,13 @@ export default function SignUp() {
               </span>
               <input
                 type="text"
-                name="name"
                 id="name"
-                required
-                value={formData.name}
-                onChange={handleChange}
+                {...register('name')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a1f44]/40"
                 placeholder="Jane Doe"
               />
             </div>
+            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
           </div>
 
           {/* Email */}
@@ -85,15 +98,13 @@ export default function SignUp() {
               </span>
               <input
                 type="email"
-                name="email"
                 id="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
+                {...register('email')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a1f44]/40"
                 placeholder="jane@example.com"
               />
             </div>
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
 
           {/* Password */}
@@ -107,15 +118,13 @@ export default function SignUp() {
               </span>
               <input
                 type="password"
-                name="password"
                 id="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
+                {...register('password')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0a1f44]/40"
                 placeholder="••••••••"
               />
             </div>
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
           </div>
 
           {/* Role */}
@@ -128,10 +137,8 @@ export default function SignUp() {
                 <Icon icon="mdi:account-cog-outline" width="20" height="20" />
               </span>
               <select
-                name="role"
                 id="role"
-                value={formData.role}
-                onChange={handleChange}
+                {...register('role')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#0a1f44]/40"
               >
                 <option value="user">User</option>
@@ -148,9 +155,7 @@ export default function SignUp() {
             type="submit"
             disabled={loading}
             className={`w-full py-3 rounded-xl text-white font-semibold transition ${
-              loading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-[#0a1f44] hover:bg-[#12284c]'
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0a1f44] hover:bg-[#12284c]'
             }`}
           >
             {loading ? 'Creating...' : 'Sign Up'}

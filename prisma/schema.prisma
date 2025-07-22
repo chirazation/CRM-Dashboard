@@ -13,7 +13,7 @@ model User {
   name      String
   email     String   @unique
   password  String
-  role      Role     @default(sales)
+  role      Role     @default(user)
   createdAt DateTime @default(now())
   leads     Lead[]   @relation("UserLeads")
 
@@ -71,7 +71,7 @@ model Reminder {
 }
 
 enum Role {
-  sales
+  user
   admin
 }
 

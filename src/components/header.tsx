@@ -15,7 +15,7 @@ export default function Header() {
       <div className="w-full border-b border-gray-200 py-3 px-4 text-sm flex justify-center bg-white text-black">
         <div className="flex items-center gap-2 text-center">
           <p className="font-medium">Get started for free</p>
-          <Image src="/images/droite.png" alt="Arrow" width={16} height={16} className="inline-block" />
+          <Image src="/images/droite.png" alt="Arrow" width={10} height={10} className="inline-block" />
         </div>
       </div>
 
@@ -39,8 +39,7 @@ export default function Header() {
 
         {/* Boutons et menu hamburger */}
         <div className="flex items-center gap-4">
-          {/* Get for free */}
-          <button className="bg-[#0a1f44] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#12284c] transition">
+          <button className=" text-white bg-[#12284c] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#12284c] transition">
             Get for free
           </button>
 

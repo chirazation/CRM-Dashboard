@@ -25,10 +25,10 @@ export default function Footer() {
               <Link href="/features" className="hover:text-[#0a1f44] font-medium transition">Features</Link>
             </li>
             <li>
-              <Link href="/pricing" className="hover:text-[#0a1f44] font-medium transition">Pricing</Link>
+              <Link href="/aboutus" className="hover:text-[#0a1f44] font-medium transition">About us</Link>
             </li>
             <li>
-              <Link href="/contact" className="hover:text-[#0a1f44] font-medium transition">Contact</Link>
+              <Link href="/contactus" className="hover:text-[#0a1f44] font-medium transition">Contact us</Link>
             </li>
           </ul>
         </div>

@@ -9,10 +9,19 @@ import { NextAuthOptions, User } from 'next-auth';
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
+  
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization:{
+        params:{
+          prompt: 'select_account',
+          access_type: 'offline',
+          response_type:'code',
+          scope: 'openid email profile https://www.googleapis.com/auth/calendar'
+        }
+      }
     }),
 
     CredentialsProvider({
@@ -49,7 +58,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/auth/login', // ta page login personnalisée
+    signIn: '/auth/login', 
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

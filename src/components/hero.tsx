@@ -35,11 +35,11 @@ export const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-[#0a1f44] font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-gray-100 transition">
+            <button className="text-white bg-[#0a1f44] font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-gray-100 transition">
               Get for free
             </button>
             <Link href="/auth/register">
-            <button className="border border-white text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-[#0a1f44] transition">
+            <button className="border text-[#0a1f44] bg-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-[#0a1f44] transition">
               Register now 
             </button>
             </Link>

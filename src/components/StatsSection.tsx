@@ -73,7 +73,7 @@ export const StatsSection = () => {
         <StatItem label="Utilisateurs actifs" value={5200} color="text-blue-600" />
         <StatItem label="Taux de disponibilité (%)" value={99} color="text-green-600" />
         <StatItem label="Support 24/7" value={1} color="text-orange-500" />
-        <StatItem label="Projets réalisés" value={320} color="text-purple-600" />
+        <StatItem label="Clients satisfaits(%)" value={90} color="text-purple-600" />
       </div>
     </section>
   );

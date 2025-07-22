@@ -21,7 +21,7 @@ export default function ContactForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('✅ Thank you for reaching out! We’ll get back to you shortly.');
+    setStatus(' Thank you for reaching out! We’ll get back to you shortly.');
     setFormData({ name: '', email: '', message: '' });
   };
 

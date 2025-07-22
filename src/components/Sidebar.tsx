@@ -5,24 +5,22 @@ import { usePathname } from 'next/navigation';
 import { SIDENAV_ITEMS } from '@/constants';
 import { SideNavItem } from '@/types';
 import { Icon } from '@iconify/react';
+import { signOut } from 'next-auth/react';
 
 const SideNav = () => {
   return (
-    <div
-      className="md:w-60 bg-[#F9FAFB] h-screen flex-1 fixed hidden md:flex border-r border-zinc-200 shadow-md hover:shadow-xl
-        transition-shadow duration-300 ease-in-out"
-    >
-      <div className="flex flex-col justify-between w-full">
+    <div className="w-50  bg-[#F9FAFB] h-screen flex flex-col border-r border-zinc-200 shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out hidden md:flex">
+      <div className="flex flex-col  w-full">
         <div>
-          <div className="flex flex-col space-y-2 md:px-6  mt-5">
+          <div className="flex flex-col space-y-2 md:px-6 mt-5">
             {SIDENAV_ITEMS.map((item, idx: number) => (
               <MenuItem key={idx} item={item} />
             ))}
           </div>
         </div>
-
-        <div className="p-4">
-          <button className="flex items-center gap-3 w-full text-red-600 p-2 hover:bg-red-100 rounded-xl ">
+         {/* button sign out  */}
+        <div className="mt-45 space-y-2 md:px-6">
+          <button onClick={() => signOut({ callbackUrl: '/' })} className="flex items-center gap-3 w-full text-red-600 p-2 hover:bg-red-100 rounded-xl ">
             <Icon icon="lucide:log-out" width={22} height={22} />
             <span className="text-sm font-medium">Sign Out</span>
           </button>

@@ -1,3 +1,3 @@
-export default function RemindersPage() {
-  return <h1>Rappels 🔔</h1>;
+export default function ContactsPage() {
+  return <h1>Liste des Contacts 📇</h1>;
 }

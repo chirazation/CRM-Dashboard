@@ -2,26 +2,46 @@
 
 import { useState } from 'react';
 import { Icon } from '@iconify/react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+// Schema de validation Zod
+const schema = z.object({
+  email: z.string().email('Please enter a valid email address.'),
+});
+
+type FormData = z.infer<typeof schema>;
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '' },
+  });
+
+  const onSubmit = async (data: FormData) => {
     setMessage('');
+    setServerError('');
 
-    if (!email) {
-      setError('Please enter your email address.');
-      return;
+    try {
+      // Ici tu peux appeler ton API pour envoyer l'email
+      // const res = await fetch('/api/forgot-password', { ... });
+
+      // Simule une réponse de succès :
+      setMessage(`If an account with ${data.email} exists, a password reset link has been sent.`);
+      reset();
+    } catch (err) {
+      console.error(err);
+      setServerError('Something went wrong. Please try again later.');
     }
-
-    
-
-    setMessage(`If an account with ${email} exists, a password reset link has been sent.`);
-    setEmail('');
   };
 
   return (
@@ -31,7 +51,7 @@ export default function ForgotPassword() {
           Forgot Password
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email Address
           </label>
@@ -43,15 +63,21 @@ export default function ForgotPassword() {
               type="email"
               id="email"
               autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register('email')}
               className="w-full border border-gray-300 rounded-xl px-10 py-3 focus:outline-none focus:ring-2 focus:ring-[#0a1f44]/40"
               placeholder="you@example.com"
-              required
             />
           </div>
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {/* Validation error */}
+          {errors.email && (
+            <p className="text-red-600 text-sm">{errors.email.message}</p>
+          )}
+
+          {/* Server error */}
+          {serverError && <p className="text-red-600 text-sm">{serverError}</p>}
+
+          {/* Message */}
           {message && <p className="text-green-600 text-sm">{message}</p>}
 
           <button
