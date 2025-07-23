@@ -1,14 +1,8 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient} from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server';
 
-const prisma = new PrismaClient(); 
-export default prisma;
-
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const id = Number(params.id);
+export async function PUT(request: NextRequest, { params} : { params: Promise<{id : number }>}) {
+  const { id } = await params;
   const body = await request.json();
   const { name, industry, location } = body;
 
@@ -30,11 +24,9 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+export async function DELETE(request: NextRequest, { params} : { params: Promise<{id : number }>}
 ) {
-  const id = Number(params.id);
+  const { id } = await params;
 
   try {
     await prisma.company.delete({ where: { id } });
