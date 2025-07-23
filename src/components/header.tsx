@@ -3,9 +3,10 @@ import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession, signIn, signOut } from 'next-auth/react';
-
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation'
 export default function Header() {
+    const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: session } = useSession();
 
@@ -31,9 +32,9 @@ export default function Header() {
         {/* Navigation desktop */}
         <nav className="hidden md:flex flex-wrap items-center gap-6 text-sm font-medium">
           <Link href="/" className="hover:font-bold hover:text-[#12284c] transition">Home</Link>
-          <Link href="/" className="hover:font-bold hover:text-[#12284c] transition">Feautures</Link>
-          <Link href="/" className="hover:text-[#12284c] hover:font-bold transition">About us </Link>
-          <Link href="/dashboardgrand/help" className="hover:text-[#12284c] hover:font-bold transition">Help</Link>
+          <Link href="/feautures" className="hover:font-bold hover:text-[#12284c] transition">Feautures</Link>
+          <Link href="#footer" className="hover:text-[#12284c] hover:font-bold transition">About us </Link>
+          <Link href="/help" className="hover:text-[#12284c] hover:font-bold transition">Help</Link>
           <Link href="/contactus1" className="hover:text-[#12284c] hover:font-bold transition">Contact us</Link>
         </nav>
 
@@ -44,12 +45,25 @@ export default function Header() {
           </button>
 
           {/* Sign In */}
-          {!session && (
-        <button onClick={() => signIn()} className="text-sm font-medium text-[#0a1f44] hover:underline">
-           Sign In
-        </button>
-           )}
-
+          {session ? (
+            
+            <button
+              onClick={() => signOut()}
+              className="block px-4 text-sm font-medium text-red-600 hover:underline"
+            >
+              Sign Out
+            </button>
+           
+          ) : (
+            <button
+              onClick={() => router.push('/auth/login')}
+              className="block px-4 text-sm font-medium text-[#0a1f44] hover:underline"
+            >
+              Sign In
+            </button>
+            
+          )}
+         
           {/* Hamburger menu (mobile only) */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -65,27 +79,29 @@ export default function Header() {
       {menuOpen && (
         <nav className="md:hidden bg-white border-t border-gray-200 px-4 py-4">
           <Link href="/" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Home</Link>
-          <Link href="/" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Features</Link>
-          <Link href="/" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Help</Link>
-          <Link href="/" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">About us</Link>
-          <Link href="/dashboardgrand/help" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Help</Link>
-          <Link href="/dashboardgrand/contactus" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Contact Us</Link>
+          <Link href="/feautures" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Features</Link>
+          <Link href="#footer" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">About us</Link>
+          <Link href="/help" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Help</Link>
+          <Link href="/contactus1" className="block py-2 text-sm font-medium hover:text-[#12284c] transition">Contact Us</Link>
 
           {/* Mobile Sign In / Out */}
           {session ? (
+            
             <button
               onClick={() => signOut()}
               className="block mt-4 text-sm font-medium text-red-600 hover:underline"
             >
               Sign Out
             </button>
+           
           ) : (
             <button
-              onClick={() => signIn()}
+              onClick={() => router.push('/auth/login')}
               className="block mt-4 text-sm font-medium text-[#0a1f44] hover:underline"
             >
               Sign In
             </button>
+            
           )}
         </nav>
       )}

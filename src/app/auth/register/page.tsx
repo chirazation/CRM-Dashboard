@@ -7,13 +7,17 @@ import { Icon } from '@iconify/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Link from 'next/link';
 
-// Zod Schema
+
+const roles = ['sales', 'admin'] as const;
+
+
 const schema = z.object({
   name: z.string().min(2, 'Name is too short'),
   email: z.string().email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
-  role: z.enum(['user', 'admin']),
+  role: z.enum(roles),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -22,6 +26,7 @@ export default function SignUp() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<{ name: string } | null>(null); // 🆕 ajouté
 
   const {
     register,
@@ -33,7 +38,7 @@ export default function SignUp() {
       name: '',
       email: '',
       password: '',
-      role: 'user',
+      role: 'sales',
     },
   });
 
@@ -42,16 +47,21 @@ export default function SignUp() {
     setError('');
 
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
+      const json = await res.json(); 
+
       if (res.ok) {
-        router.push('/');
+        setUser(json.user); 
+        setError('');
+        if (json.user) {
+          router.push('/dashboard');
+        }
       } else {
-        const json = await res.json();
         setError(json.message || 'An error occurred.');
       }
     } catch {
@@ -60,6 +70,22 @@ export default function SignUp() {
 
     setLoading(false);
   };
+
+  // 🆕 Affichage personnalisé après inscription
+  if (user) {
+    return (
+      <div className="p-8 bg-white rounded-3xl shadow-xl w-full max-w-md space-y-6 mt-4 mb-4 text-center">
+        <h2 className="text-2xl font-semibold text-[#0a1f44]">Hi, {user.name}!</h2>
+        <p className="mt-4">Your account has been created successfully.</p>
+        <button
+          onClick={() => router.push('/dashboardgrand')}
+          className="mt-6 px-6 py-3 bg-[#0a1f44] text-white rounded-xl hover:bg-[#12284c]"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center bg-gray-100 px-4">
@@ -141,8 +167,11 @@ export default function SignUp() {
                 {...register('role')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#0a1f44]/40"
               >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                {roles.map((role) => (
+                  <option key={role} value={role}>
+                    {role === 'sales' ? 'Sales' : 'Admin'}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -184,9 +213,9 @@ export default function SignUp() {
         {/* Sign in link */}
         <p className="text-sm text-center text-gray-600 mt-4">
           Already have an account?{' '}
-          <a href="/auth/login" className="text-[#0a1f44] font-semibold hover:underline">
+          <Link href="/auth/login" className="text-[#0a1f44] font-semibold hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

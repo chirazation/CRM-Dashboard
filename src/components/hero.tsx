@@ -102,9 +102,11 @@ export const Hero = () => {
               placeholder="Your email address"
               className="px-4 py-3 rounded-lg w-full sm:w-auto text-black border border-gray-300"
             />
+            <Link href="/auth/register">
             <button className="bg-[#0a1f44] text-white px-6 py-3 rounded-lg hover:bg-[#12284c] transition font-semibold">
               Get Started Now
             </button>
+            </Link>
           </form>
         </div>
       </section>

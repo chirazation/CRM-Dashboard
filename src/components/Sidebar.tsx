@@ -9,7 +9,7 @@ import { signOut } from 'next-auth/react';
 
 const SideNav = () => {
   return (
-    <div className="w-50  bg-[#F9FAFB] h-screen flex flex-col border-r border-zinc-200 shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out hidden md:flex">
+    <div className="w-50  bg-[#F9FAFB] h-screen flex-col border-r border-zinc-200 shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out hidden md:flex sticky top-[58px]">
       <div className="flex flex-col  w-full">
         <div>
           <div className="flex flex-col space-y-2 md:px-6 mt-5">
@@ -19,7 +19,7 @@ const SideNav = () => {
           </div>
         </div>
          {/* button sign out  */}
-        <div className="mt-45 space-y-2 md:px-6">
+        <div className="mt-58 space-y-2 md:px-6">
           <button onClick={() => signOut({ callbackUrl: '/' })} className="flex items-center gap-3 w-full text-red-600 p-2 hover:bg-red-100 rounded-xl ">
             <Icon icon="lucide:log-out" width={22} height={22} />
             <span className="text-sm font-medium">Sign Out</span>
