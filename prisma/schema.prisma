@@ -20,46 +20,24 @@ model User {
   @@map("users")
 }
 
+
 model Lead {
-  id         Int        @id @default(autoincrement())
-  name       String
-  email      String
-  phone      String
-  status     LeadStatus
-  assignedTo Int
-  source     String?
-  createdAt  DateTime   @default(now())
-  notes      String?
-  companyId  Int?
-  user       User       @relation("UserLeads", fields: [assignedTo], references: [id])
-  company    Company?   @relation("CompanyLeads", fields: [companyId], references: [id])
-  reminders  Reminder[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String
+  phone       String
+  status      LeadStatus
+  assignedTo  Int
+  source      String     
+  createdAt   DateTime   @default(now())
+  notes       String?   
+  companyName String     
+  user        User       @relation("UserLeads", fields: [assignedTo], references: [id])
+  reminders   Reminder[]
 
   @@map("leads")
 }
 
-model Contact {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String
-  phone     String
-  companyId Int?
-  company   Company? @relation(fields: [companyId], references: [id])
-
-  @@map("contacts")
-}
-
-
-model Company {
-  id       Int       @id @default(autoincrement())
-  name     String
-  industry String?
-  location String?
-  contacts Contact[]
-  leads    Lead[]    @relation("CompanyLeads")
-
-  @@map("companies")
-}
 
 model Reminder {
   id           Int      @id @default(autoincrement())
