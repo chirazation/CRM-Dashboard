@@ -1,4 +1,4 @@
-// components/tunisiaselect.tsx
+
 'use client'
 
 import {
@@ -13,10 +13,10 @@ import React from "react"
 
 type Props = {
   value?: string
-  onChange: (value: string) => void
+  onChangeAction: (value: string) => void
 }
 
-export const TunisiaGovernorateSelect: React.FC<Props> = ({ value, onChange }) => {
+export const TunisiaGovernorateSelect: React.FC<Props> = ({ value, onChangeAction }) => {
   const governorates = [
     "Tunis", "Ariana", "Ben Arous", "Manouba", "Nabeul", "Zaghouan",
     "Bizerte", "Béja", "Jendouba", "Kef", "Siliana", "Kairouan",
@@ -25,7 +25,7 @@ export const TunisiaGovernorateSelect: React.FC<Props> = ({ value, onChange }) =
   ];
 
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value} onValueChange={onChangeAction}>
       <SelectTrigger className="w-full border border-gray-300 rounded-lg px-4 py-2">
         <SelectValue placeholder="Select a governorate" />
       </SelectTrigger>

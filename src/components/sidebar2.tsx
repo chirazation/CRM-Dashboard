@@ -20,16 +20,7 @@ export default function Sidebar2() {
           <Icon icon="lucide:layout-dashboard" className="w-5 h-5 text-white" />
         </button>
         </Link>
-        <Link href={"/dashboardgrand/companies"}>
-        <button className="hover:bg-gray-200 p-2 rounded" aria-label="companies">
-          <Icon icon="lucide:building-2" className="w-5 h-5 text-white" />
-        </button>
-        </Link>
-        <Link href={"/dashboardgrand/contacts"}>
-        <button className="hover:bg-gray-200 p-2 rounded" aria-label="contacts">
-          <Icon icon="lucide:users" className="w-5 h-5 text-white" />
-        </button>
-        </Link>
+        
         <Link href={"/dashboardgrand/leads"}>
         <button className="hover:bg-gray-200 p-2 rounded" aria-label="leads">
           <Icon icon="lucide:users-round" className="w-5 h-5 text-white" />
@@ -40,11 +31,7 @@ export default function Sidebar2() {
           <Icon icon="lucide:alarm-clock" className="w-5 h-5 text-white" />
         </button>
         </Link>
-        <Link href={"/dashboardgrand/contactus"}>
-        <button className="hover:bg-gray-200 p-2 rounded" aria-label="contactus">
-          <Icon icon="lucide:message-circle" className="w-5 h-5 text-white" />
-        </button>
-        </Link>
+        
         <Link href={"/dashboardgrand/help"}>
         <button className="hover:bg-gray-200 p-2 rounded" aria-label="help">
           <Icon icon="lucide:help-circle" className="w-5 h-5 text-white" />

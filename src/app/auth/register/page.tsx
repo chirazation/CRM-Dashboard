@@ -59,7 +59,7 @@ export default function SignUp() {
         setUser(json.user); 
         setError('');
         if (json.user) {
-          router.push('/dashboard');
+          router.push('/dashboardgrand');
         }
       } else {
         setError(json.message || 'An error occurred.');
@@ -71,7 +71,6 @@ export default function SignUp() {
     setLoading(false);
   };
 
-  // 🆕 Affichage personnalisé après inscription
   if (user) {
     return (
       <div className="p-8 bg-white rounded-3xl shadow-xl w-full max-w-md space-y-6 mt-4 mb-4 text-center">

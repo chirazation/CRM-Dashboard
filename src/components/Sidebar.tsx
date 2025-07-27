@@ -19,7 +19,7 @@ const SideNav = () => {
           </div>
         </div>
          {/* button sign out  */}
-        <div className="mt-58 space-y-2 md:px-6">
+        <div className="mt-90 space-y-2 md:px-6">
           <button onClick={() => signOut({ callbackUrl: '/' })} className="flex items-center gap-3 w-full text-red-600 p-2 hover:bg-red-100 rounded-xl ">
             <Icon icon="lucide:log-out" width={22} height={22} />
             <span className="text-sm font-medium">Sign Out</span>
