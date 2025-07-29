@@ -12,10 +12,10 @@ import { LeadStatus} from '@prisma/client';
 import { LeadService, Lead, CreateLeadData } from "@/lib/leadService";
 
 const statusColor = {
-  new: "bg-blue-100 text-blue-700",
-  contacted: "bg-yellow-100 text-yellow-700",
-  qualified: "bg-orange-100 text-orange-700",
-  converted: "bg-green-100 text-green-700",
+  new: "bg-blue-100 text-blue-700 rounded-lg",
+  contacted: "bg-yellow-100 text-yellow-700 rounded-lg",
+  qualified: "bg-purple-100 text-purple-700 rounded-lg",
+  converted: "bg-green-100 text-green-700 rounded-lg",
 };
 
 const statusLabels = {
@@ -257,24 +257,24 @@ export default function LeadTable() {
 
         {/* Modal de confirmation de suppression */}
         {deleteConfirm.show && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
-              <h3 className="text-lg font-semibold mb-4">Confirmer la suppression</h3>
+              <h3 className="text-lg font-semibold mb-4">Confirm deletion</h3>
               <p className="text-gray-600 mb-6">
-                Êtes-vous sûr de vouloir supprimer ce lead ? Cette action est irréversible.
+                Are you sure you want to delete the lead? This action is irreversible.
               </p>
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setDeleteConfirm({ show: false, leadId: null })}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                 >
-                  Annuler
+                  Cancel
                 </button>
                 <button
                   onClick={handleDelete}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
                 >
-                  Supprimer
+                  Delete
                 </button>
               </div>
             </div>
@@ -376,17 +376,17 @@ export default function LeadTable() {
           <button
             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1 text-sm border rounded hover:bg-gray-100 disabled:opacity-50"
+            className="px-2 py-1 text-sm border rounded hover:bg-gray-100 disabled:opacity-50"
           >
             Prev
           </button>
           <span className="text-sm">
-            Page {currentPage} of {totalPages}
+            {currentPage} of {totalPages}
           </span>
           <button
             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 text-sm border rounded hover:bg-gray-100 disabled:opacity-50"
+            className="px-2 py-1 text-sm border rounded hover:bg-gray-100 disabled:opacity-50"
           >
             Next
           </button>

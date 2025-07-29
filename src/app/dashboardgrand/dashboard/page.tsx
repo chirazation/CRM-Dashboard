@@ -8,12 +8,12 @@ export default function DashboardPage() {
   <div className='ml-5 mr-5'> 
     <TopCards/>
     <div className="grid lg:grid-cols-3 gap-4">
-       <div className="col-span-2 ">
+       <div className="col-span-2 h-full ">
           <ChartAreaGradient/>
        </div>
        <div className="col-span-1 w-full sm:w-[415px] max-h-full">
         <ChartPieDonutText/>
-        <div className="bg-white w-full border mt-4 rounded-lg h-45 sm:w-[415px] ">
+        <div className="bg-white w-full border mt-4 rounded-lg  sm:w-[415px] h-30 ">
             <Status/>
         </div>
         <div>
