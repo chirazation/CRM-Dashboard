@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 
-// Schéma de validation Zod
+// Schema validation Zod
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -20,6 +20,7 @@ type FormData = z.infer<typeof schema>;
 export default function ContactForm() {
   const router = useRouter();
   const [status, setStatus] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -36,15 +37,34 @@ export default function ContactForm() {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    // Ici, tu peux appeler une API pour envoyer les données
-    console.log(data);
-    setStatus('Thank you for reaching out! We’ll get back to you shortly.');
-    reset();
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    setStatus('');
 
-    setTimeout(() => {
-      router.push('/');
-    }, 2000);
+    try {
+      const response = await fetch('/api/contactus', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      setStatus('Thank you for reaching out! We\'ll get back to you shortly.');
+      reset();
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setStatus('Sorry, there was an error sending your message. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -66,7 +86,8 @@ export default function ContactForm() {
             id="name"
             {...register('name')}
             placeholder="John Doe"
-            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition ${
+            disabled={isLoading}
+            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition disabled:opacity-50 disabled:cursor-not-allowed ${
               errors.name ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -90,7 +111,8 @@ export default function ContactForm() {
             type="email"
             {...register('email')}
             placeholder="your.email@company.com"
-            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition ${
+            disabled={isLoading}
+            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition disabled:opacity-50 disabled:cursor-not-allowed ${
               errors.email ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -99,29 +121,30 @@ export default function ContactForm() {
           <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
+
       {/* Phone */}
       <div>
-  <label htmlFor="phone" className="block mb-1 text-base font-medium text-[#1F2937]">
-    Phone Number
-  </label>
-  <div className="relative">
-    <span className="absolute left-4 top-3.5 text-gray-400">
-      <Icon icon="mdi:phone-outline" width="20" height="20" />
-    </span>
-    <input
-      id="phone"
-      {...register('phone')}
-      placeholder="12345678"
-      className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition ${
-        errors.phone ? 'border-red-500' : 'border-gray-300'
-      }`}
-    />
-  </div>
-  {errors.phone && (
-    <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>
-  )}
-</div>
-
+        <label htmlFor="phone" className="block mb-1 text-base font-medium text-[#1F2937]">
+          Phone Number
+        </label>
+        <div className="relative">
+          <span className="absolute left-4 top-3.5 text-gray-400">
+            <Icon icon="mdi:phone-outline" width="20" height="20" />
+          </span>
+          <input
+            id="phone"
+            {...register('phone')}
+            placeholder="12345678"
+            disabled={isLoading}
+            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+              errors.phone ? 'border-red-500' : 'border-gray-300'
+            }`}
+          />
+        </div>
+        {errors.phone && (
+          <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>
+        )}
+      </div>
 
       {/* Message */}
       <div>
@@ -137,7 +160,8 @@ export default function ContactForm() {
             rows={5}
             {...register('message')}
             placeholder="Let us know how we can help..."
-            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition resize-none ${
+            disabled={isLoading}
+            className={`w-full pl-11 pr-4 py-3 border rounded-xl bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A1F44]/30 transition resize-none disabled:opacity-50 disabled:cursor-not-allowed ${
               errors.message ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -150,14 +174,26 @@ export default function ContactForm() {
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full py-3 bg-[#0A1F44] text-white font-semibold rounded-xl hover:bg-[#12284C] transition-colors text-lg"
+        disabled={isLoading}
+        className="w-full py-3 bg-[#0A1F44] text-white font-semibold rounded-xl hover:bg-[#12284C] transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        Send Message
+        {isLoading ? (
+          <>
+            <Icon icon="mdi:loading" className="animate-spin mr-2" width="20" height="20" />
+            Sending...
+          </>
+        ) : (
+          'Send Message'
+        )}
       </button>
 
       {/* Status Message */}
       {status && (
-        <p className="mt-4 text-center text-green-600 font-medium text-base">
+        <p className={`mt-4 text-center font-medium text-base ${
+          status.includes('error') || status.includes('Sorry') 
+            ? 'text-red-600' 
+            : 'text-green-600'
+        }`}>
           {status}
         </p>
       )}

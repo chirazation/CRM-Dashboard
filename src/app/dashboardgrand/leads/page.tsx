@@ -282,7 +282,7 @@ export default function LeadTable() {
         )}
 
         <Table className="rounded-lg border">
-          <TableHeader>
+          <TableHeader className='bg-gray-200'>
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
