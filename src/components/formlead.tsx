@@ -1,90 +1,96 @@
-import React from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-// Enum LeadStatus
-enum LeadStatus {
-  new = "new",
-  contacted = "contacted",
-  qualified = "qualified",
-  converted = "converted",
-}
+import { LeadStatus } from '@prisma/client';
+import { CreateLeadData, Lead } from '@/lib/leadService';
 
 const leadSchema = z.object({
   name: z.string().min(4, { message: "Name must be at least 4 characters" }),
   email: z.string().email({ message: "Invalid email" }),
   phone: z.string().length(8, { message: "Phone must be exactly 8 digits" }),
-  status: z.nativeEnum(LeadStatus, {
-    message: "Please select a valid status"
-  }),
-  assignedTo: z.number({
-    message: "Assigned To must be a number"
-  }).int({ message: "Must be an integer" }).positive({ message: "Must be a positive number" }),
+  status: z.nativeEnum(LeadStatus),
+  assignedTo: z.number().int().positive(),
   source: z.string().min(1, { message: "Source is required" }),
   notes: z.string().optional(),
   companyName: z.string().min(5, { message: "Company name must be at least 5 characters" }),
+  officePhone: z.string().optional(),
 });
 
 type LeadFormData = z.infer<typeof leadSchema>;
 
-const commonSources = [
-  "Website",
-  "LinkedIn", 
-  "Referral",
-  "Cold Email",
-  "Phone Call",
-  "Social Media",
-  "Event",
-  "Advertisement",
-  "Other"
-];
+interface LeadFormProps {
+  initialData?: Lead | null;
+  onSubmit: (data: CreateLeadData) => Promise<void>;
+  isEditing?: boolean;
+}
 
-export default function LeadForm() {
+export default function LeadForm({ initialData, onSubmit, isEditing = false }: LeadFormProps) {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    watch
+    watch,
+    setValue
   } = useForm<LeadFormData>({
     resolver: zodResolver(leadSchema),
     defaultValues: {
       notes: "",
       assignedTo: 1,
+      status: LeadStatus.new,
     }
   });
 
+  useEffect(() => {
+    if (initialData && isEditing) {
+      setValue('name', initialData.name);
+      setValue('email', initialData.email);
+      setValue('phone', initialData.phone);
+      setValue('status', initialData.status);
+      setValue('assignedTo', initialData.assignedTo);
+      setValue('source', initialData.source);
+      setValue('notes', initialData.notes || '');
+      setValue('companyName', initialData.companyName);
+      setValue('officePhone', initialData.officePhone || '');
+    }
+  }, [initialData, isEditing, setValue]);
+
   const selectedStatus = watch("status");
 
-  // Fixed: Using SubmitHandler type for proper typing
-  const onSubmit: SubmitHandler<LeadFormData> = async (data) => {
+  const onSubmitHandler = async (data: LeadFormData) => {
     try {
-      console.log("Submitted data:", data);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert("Lead created successfully!");
-      reset();
+      const submitData: CreateLeadData = {
+        ...data,
+        notes: data.notes || "", 
+      };
+      
+      await onSubmit(submitData);
+      if (!isEditing) {
+        reset(); 
+      }
     } catch (error) {
-      console.error("Error creating lead:", error);
-      alert("Error creating lead");
+      console.error("Error submitting form:", error);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Create New Lead</h2>
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        {isEditing ? 'Edit Lead' : 'Create New Lead'}
+      </h2>
       
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-6">
         {/* Name */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-            Name *
+            Full Name *
           </label>
           <input
             id="name"
             {...register("name")}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
-            placeholder="Full name"
+            placeholder="Full Name"
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
@@ -118,13 +124,14 @@ export default function LeadForm() {
             {...register("phone")}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
             placeholder="12345678"
+            maxLength={8}
           />
           {errors.phone && (
             <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
           )}
         </div>
 
-         {/* Company Name */}
+        {/* Company Name */}
         <div>
           <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-2">
             Company Name *
@@ -132,12 +139,25 @@ export default function LeadForm() {
           <input
             id="companyName"
             {...register("companyName")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700W focus:border-transparent"
-            placeholder="Company name"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
+            placeholder="Company Name"
           />
           {errors.companyName && (
             <p className="mt-1 text-sm text-red-600">{errors.companyName.message}</p>
           )}
+        </div>
+
+        {/* Office Phone */}
+        <div>
+          <label htmlFor="officePhone" className="block text-sm font-medium text-gray-700 mb-2">
+            Office Phone
+          </label>
+          <input
+            id="officePhone"
+            {...register("officePhone")}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
+            placeholder="Office phone (optional)"
+          />
         </div>
 
         {/* Source */}
@@ -145,24 +165,19 @@ export default function LeadForm() {
           <label htmlFor="source" className="block text-sm font-medium text-gray-700 mb-2">
             Source *
           </label>
-          <select
-            id="source"
-            {...register("source")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
-          >
-            <option value="">- Select source -</option>
-            {commonSources.map((source) => (
-              <option key={source} value={source}>
-                {source}
-              </option>
-            ))}
-          </select>
+          <input
+  id="source"
+  type="text"
+  {...register("source")}
+  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
+  placeholder="Source"
+/>
           {errors.source && (
             <p className="mt-1 text-sm text-red-600">{errors.source.message}</p>
           )}
         </div>
 
-        {/* Assigned To - Fixed: Removed valueAsNumber since z.coerce.number handles conversion */}
+        {/* Assigned To */}
         <div>
           <label htmlFor="assignedTo" className="block text-sm font-medium text-gray-700 mb-2">
             Assigned To (User ID) *
@@ -170,13 +185,40 @@ export default function LeadForm() {
           <input
             id="assignedTo"
             type="number"
-            {...register("assignedTo")}
+            {...register("assignedTo", { valueAsNumber: true })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
             placeholder="1"
             min="1"
           />
           {errors.assignedTo && (
             <p className="mt-1 text-sm text-red-600">{errors.assignedTo.message}</p>
+          )}
+        </div>
+
+        {/* Status */}
+        <div>
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
+            Status *
+          </label>
+          <select
+            id="status"
+            {...register("status")}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
+          >
+            <option value="">-- Select a status --</option>
+            {Object.values(LeadStatus).map((status) => (
+              <option key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </option>
+            ))}
+          </select>
+          {errors.status && (
+            <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
+          )}
+          {selectedStatus && (
+            <p className="mt-1 text-sm text-gray-600">
+              Selected status: <span className="font-medium">{selectedStatus}</span>
+            </p>
           )}
         </div>
 
@@ -197,47 +239,21 @@ export default function LeadForm() {
           )}
         </div>
 
-        {/* Status */}
-        <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-            Status *
-          </label>
-          <select
-            id="status"
-            {...register("status")}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-700 focus:border-transparent"
-          >
-            <option value="">-- Select status --</option>
-            {Object.values(LeadStatus).map((status) => (
-              <option key={status} value={status}>
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </option>
-            ))}
-          </select>
-          {errors.status && (
-            <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
-          )}
-          {selectedStatus && (
-            <p className="mt-1 text-sm text-gray-600">
-              Selected status: <span className="font-medium">{selectedStatus}</span>
-            </p>
-          )}
-        </div>
-
-        {/* Buttons - Fixed: Changed bg-gray-700 to bg-blue-600 for consistency */}
+        {/* Buttons */}
         <div className="flex gap-4 pt-4">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-gray-700 text-white py-2 px-4 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Creating..." : "Create Lead"}
+            {isSubmitting ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update Lead" : "Create Lead")}
           </button>
           
           <button
             type="button"
             onClick={() => reset()}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2"
+            disabled={isSubmitting}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 disabled:opacity-50"
           >
             Reset
           </button>

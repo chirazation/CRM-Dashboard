@@ -26,25 +26,23 @@ model Lead {
   name        String
   email       String
   phone       String
-  status      LeadStatus
+  companyName String 
+  officePhone String
+  source      String 
   assignedTo  Int
-  source      String     
+  status      LeadStatus
   createdAt   DateTime   @default(now())
   notes       String?   
-  companyName String     
+      
   user        User       @relation("UserLeads", fields: [assignedTo], references: [id])
-  reminders   Reminder[]
-
   @@map("leads")
 }
 
 
 model Reminder {
   id           Int      @id @default(autoincrement())
-  leadId       Int
   reminderDate DateTime
   note         String?
-  lead         Lead     @relation(fields: [leadId], references: [id])
 
   @@map("reminders")
 }
