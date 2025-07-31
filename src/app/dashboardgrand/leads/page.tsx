@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useCallback,useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -71,17 +70,17 @@ export default function LeadTable() {
     loadLeads();
 }, [loadLeads]); 
 
-  // Mettre à jour le statut d'un lead
-  const updateLeadStatus = async (leadId: number, newStatus: LeadStatus) => {
-    try {
-      await LeadService.updateLeadStatus(leadId, newStatus);
-      showAlert('success', 'Statut mis à jour avec succès');
-      loadLeads(); // Recharger les données
-    } catch (error) {
-      console.error('Error updating lead status:', error);
-      showAlert('error', 'Erreur lors de la mise à jour du statut');
-    }
-  };
+  // // Mettre à jour le statut d'un lead
+  // const updateLeadStatus = async (leadId: number, newStatus: LeadStatus) => {
+  //   try {
+  //     await LeadService.updateLeadStatus(leadId, newStatus);
+  //     showAlert('success', 'Statut mis à jour avec succès');
+  //     loadLeads(); // Recharger les données
+  //   } catch (error) {
+  //     console.error('Error updating lead status:', error);
+  //     showAlert('error', 'Erreur lors de la mise à jour du statut');
+  //   }
+  // };
 
   // Créer un nouveau lead
   const handleCreateLead = async (data: CreateLeadData) => {
@@ -175,14 +174,14 @@ export default function LeadTable() {
   }
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto ">
       {/* Alerte */}
       {alert.show && (
         <div className={cn(
           "fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center gap-2 transition-all duration-300",
           alert.type === 'success' 
-            ? "bg-green-100 text-green-800 border border-green-200"
-            : "bg-red-100 text-red-800 border border-red-200"
+            ? "bg-green-100 text-green-700 border border-green-200"
+            : "bg-red-100 text-red-700 border border-red-200"
         )}>
           {alert.type === 'success' ? (
             <CheckCircle className="w-5 h-5" />
@@ -236,29 +235,24 @@ export default function LeadTable() {
 
         {/* Modal du formulaire */}
         {isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-10 px-4">
+          <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-all duration-300">
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative max-h-[90vh] overflow-y-auto">
               {/* Bouton pour fermer */}
-              <button
-                onClick={handleCloseForm}
-                className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-              >
+              <button onClick={handleCloseForm} className="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
                 ✕
               </button>
-            
-              <LeadForm
-  initialData={editingLead || undefined}
-  onSubmit={editingLead ? handleUpdateLead : handleCreateLead}
-  isEditing={!!editingLead}
-/>
+              <LeadForm initialData={editingLead || undefined} onSubmit={editingLead ? handleUpdateLead : handleCreateLead} isEditing={!!editingLead}/>
+            </div>
             </div>
           </div>
         )}
 
         {/* Modal de confirmation de suppression */}
         {deleteConfirm.show && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-100 bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+          <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-all duration-300">
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
               <h3 className="text-lg font-semibold mb-4">Confirm deletion</h3>
               <p className="text-gray-600 mb-6">
                 Are you sure you want to delete the lead? This action is irreversible.
@@ -277,6 +271,7 @@ export default function LeadTable() {
                   Delete
                 </button>
               </div>
+            </div>
             </div>
           </div>
         )}
@@ -307,40 +302,9 @@ export default function LeadTable() {
                   <TableCell>{lead.user?.name || lead.assignedTo || '-'}</TableCell>
                   <TableCell>{lead.notes || '-'}</TableCell>
                   <TableCell>
-                    <Select 
-                      value={lead.status} 
-                      onValueChange={(value) => updateLeadStatus(lead.id, value as LeadStatus)}
-                    >
-                      <SelectTrigger className="w-[132px]">
-                        <SelectValue>
-                          <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor[lead.status])}>
-                            {statusLabels[lead.status]}
-                          </span>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={LeadStatus.new}>
-                          <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor.new)}>
-                            New
-                          </span>
-                        </SelectItem>
-                        <SelectItem value={LeadStatus.contacted}>
-                          <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor.contacted)}>
-                            Contacted
-                          </span>
-                        </SelectItem>
-                        <SelectItem value={LeadStatus.qualified}>
-                          <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor.qualified)}>
-                            Qualified
-                          </span>
-                        </SelectItem>
-                        <SelectItem value={LeadStatus.converted}>
-                          <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor.converted)}>
-                            Converted
-                          </span>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor[lead.status])}>
+                       {statusLabels[lead.status]}
+                    </span>
                   </TableCell>
                   <TableCell className="flex gap-3">
                     <button

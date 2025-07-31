@@ -75,7 +75,7 @@ export default function LeadForm({ initialData, onSubmit, isEditing = false }: L
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg">
+    <div className="max-w-2xl mx-auto p-6  rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
         {isEditing ? 'Edit Lead' : 'Create New Lead'}
       </h2>

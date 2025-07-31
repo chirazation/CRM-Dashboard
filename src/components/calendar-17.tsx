@@ -14,7 +14,7 @@ export function Calendar17() {
 
   return (
     <Card className="w-fit py-4">
-      <CardContent className="px-4">
+      <CardContent className="px-4 justify-center text-center">
         <Calendar
           mode="single"
           selected={date}
@@ -22,7 +22,7 @@ export function Calendar17() {
           className="bg-transparent p-0 [--cell-size:--spacing(10.5)]"
         />
       </CardContent>
-      <CardFooter className="flex gap-2 border-t px-4 !pt-4 *:[div]:w-full">
+      <CardFooter className="flex gap-2 border-t px-4 !pt-4 *:[div]:w-full justify-center text-center">
         <div>
           <Label htmlFor="time-from" className="sr-only">
             Start Time

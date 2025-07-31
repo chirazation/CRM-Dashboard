@@ -33,16 +33,21 @@ model Lead {
   status      LeadStatus
   createdAt   DateTime   @default(now())
   notes       String?   
-      
+  
   user        User       @relation("UserLeads", fields: [assignedTo], references: [id])
   @@map("leads")
 }
 
 
 model Reminder {
+  
   id           Int      @id @default(autoincrement())
+  title  String 
+  description String
   reminderDate DateTime
-  note         String?
+  note String?
+  createdAt    DateTime @default(now())
+
 
   @@map("reminders")
 }

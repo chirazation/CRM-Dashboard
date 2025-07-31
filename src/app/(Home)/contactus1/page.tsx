@@ -22,19 +22,8 @@ export default function ContactForm() {
   const [status, setStatus] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      message: '',
-    },
+  const {register,handleSubmit,formState: { errors },reset,} = useForm<FormData>({
+    resolver: zodResolver(schema),defaultValues: {name: '',email: '',phone: '',message: '',},
   });
 
   const onSubmit = async (data: FormData) => {
