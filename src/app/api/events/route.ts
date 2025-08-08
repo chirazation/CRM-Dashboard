@@ -3,26 +3,24 @@ import { PrismaClient} from '@prisma/client';
 import { z } from 'zod';
 const prisma = new PrismaClient();
 
-const reminderSchema = z.object({
+const eventSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
   description: z.string().min(1, "Description is required").max(500),
-  reminderDate: z.date({message: "Please select a reminder date",}),
-  note: z.string().optional(),
+  eventDate: z.date({message: "Please select an event date",}),
+  location: z.string().optional(),
 });
 // GET 
 export async function GET(): Promise<NextResponse> {
   try {
-    const reminders = await prisma.reminder.findMany({
+    const events = await prisma.event.findMany({
       orderBy: { createdAt: 'desc' }
     });
 
-    console.log('reminders', reminders)
-
-    return NextResponse.json({ reminders });
+    return NextResponse.json({ events });
   } catch (error) {
-    console.error('Error fetching reminders:', error);
+    console.error('Error fetching events:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch reminders' },
+      { error: 'Failed to fetch events' },
       { status: 500 }
     );
   }
@@ -32,22 +30,18 @@ export async function GET(): Promise<NextResponse> {
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
-    // Convertir reminderDate en Date si c’est une string
-    if (typeof body.reminderDate === 'string') {
-     body.reminderDate = new Date(body.reminderDate);
-    }
-    const validatedData = reminderSchema.parse(body);
-    const { title, description, reminderDate, note } = validatedData;
-    const newReminder = await prisma.reminder.create({
+    const validatedData = eventSchema.parse(body);
+    const { title, description, eventDate, location } = validatedData;
+    const newevent = await prisma.event.create({
       data: {
         title,
         description,
-        reminderDate,
-        note,
+        eventDate,
+        location,
       },
     });
 
-    return NextResponse.json(newReminder, { status: 201 });
+    return NextResponse.json(newevent, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

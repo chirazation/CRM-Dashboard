@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { ZodError } from 'zod';
 const prisma = new PrismaClient();
 
-// Schema de validation pour créer/modifier un lead
 const leadSchema = z.object({
   name: z.string().min(4, { message: "Name must be at least 4 characters" }),
   email: z.string().email({ message: "Invalid email" }),
@@ -40,7 +39,7 @@ export async function GET(): Promise<NextResponse> {
   }
 }
 
-// POST - Créer un nouveau lead
+// POST 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();

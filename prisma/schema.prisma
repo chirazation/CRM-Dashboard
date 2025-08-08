@@ -51,6 +51,18 @@ model Reminder {
 
   @@map("reminders")
 }
+model Event {
+  
+  id           Int      @id @default(autoincrement())
+  title  String 
+  description String
+  eventDate DateTime
+  location String?
+  createdAt    DateTime @default(now())
+
+
+  @@map("event")
+}
 model Contactus {
   id        Int     @id @default(autoincrement())
   name      String

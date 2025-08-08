@@ -1,4 +1,4 @@
-// app/api/leads/[id]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient, LeadStatus } from '@prisma/client';
 import { z } from 'zod';

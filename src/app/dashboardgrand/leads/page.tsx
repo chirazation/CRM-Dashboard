@@ -37,15 +37,12 @@ export default function LeadTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
-  const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState<AlertState>({ show: false, type: 'success', message: '' });
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; leadId: number | null }>({
     show: false,
     leadId: null
   });
   const perPage = 10;
-
- 
   const showAlert = (type: 'success' | 'error', message: string) => {
     setAlert({ show: true, type, message });
     setTimeout(() => setAlert({ show: false, type: 'success', message: '' }), 5000);
@@ -54,45 +51,29 @@ export default function LeadTable() {
 
   const loadLeads = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await LeadService.getLeads();
       setLeads(response.leads);
     } catch (error) {
-      console.error('Error loading leads:', error);
-      showAlert('error', 'Erreur lors du chargement des leads');
-    } finally {
-      setLoading(false);
-    }
+      console.error(error);
+      showAlert('error', 'Error while loading leads');
+    } 
   }, []);
 
 
   useEffect(() => {
     loadLeads();
 }, [loadLeads]); 
-
-  // // Mettre à jour le statut d'un lead
-  // const updateLeadStatus = async (leadId: number, newStatus: LeadStatus) => {
-  //   try {
-  //     await LeadService.updateLeadStatus(leadId, newStatus);
-  //     showAlert('success', 'Statut mis à jour avec succès');
-  //     loadLeads(); // Recharger les données
-  //   } catch (error) {
-  //     console.error('Error updating lead status:', error);
-  //     showAlert('error', 'Erreur lors de la mise à jour du statut');
-  //   }
-  // };
-
   // Créer un nouveau lead
   const handleCreateLead = async (data: CreateLeadData) => {
     try {
       await LeadService.createLead(data);
-      showAlert('success', 'Lead créé avec succès');
+      showAlert('success', 'Lead created successfully');
       setIsOpen(false);
       loadLeads();
     } catch (error) {
       console.error('Error creating lead:', error);
       showAlert('error', 'Erreur lors de la création du lead');
-      throw error; // Re-throw pour que le formulaire puisse gérer l'erreur
+      throw error; 
     }
   };
 
@@ -102,13 +83,13 @@ export default function LeadTable() {
     
     try {
       await LeadService.updateLead(editingLead.id, data);
-      showAlert('success', 'Lead mis à jour avec succès');
+      showAlert('success', 'Lead updated successfully');
       setIsOpen(false);
       setEditingLead(null);
       loadLeads();
     } catch (error) {
       console.error('Error updating lead:', error);
-      showAlert('error', 'Erreur lors de la mise à jour du lead');
+      showAlert('error', 'Error while updating lead');
       throw error;
     }
   };
@@ -130,12 +111,12 @@ export default function LeadTable() {
     
     try {
       await LeadService.deleteLead(deleteConfirm.leadId);
-      showAlert('success', 'Lead supprimé avec succès');
+      showAlert('success', 'Lead deleted successfully');
       setDeleteConfirm({ show: false, leadId: null });
       loadLeads();
     } catch (error) {
       console.error('Error deleting lead:', error);
-      showAlert('error', 'Erreur lors de la suppression du lead');
+      showAlert('error', 'Error while deleting lead');
     }
   };
 
@@ -164,14 +145,6 @@ export default function LeadTable() {
 
   const paginatedLeads = filteredLeads.slice((currentPage - 1) * perPage, currentPage * perPage);
   const totalPages = Math.ceil(filteredLeads.length / perPage);
-
-  if (loading) {
-    return (
-      <div className="w-full flex items-center justify-center py-8">
-        <div className="text-gray-500">Chargement des leads...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full overflow-x-auto ">
