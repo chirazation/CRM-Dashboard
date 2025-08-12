@@ -8,9 +8,8 @@ import QuickStats from '@/components/quickstats';
 export default async function RemindersPage() {
   const data = await fetch('http://localhost:3000/api/reminders');
   const remindersData = await data.json();
-  console.log("type of data", typeof remindersData.reminders);
-  console.log('reminders data', remindersData.reminders);
-  
+  const dataevent = await fetch('http://localhost:3000/api/events');
+  const eventsData = await dataevent.json();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
@@ -19,7 +18,7 @@ export default async function RemindersPage() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2">
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
-             <CalendarTabs reminders={remindersData.reminders} /> 
+             <CalendarTabs reminders={remindersData.reminders} events={eventsData.events} /> 
             </div>
           </div>
           <div className="xl:col-span-1 space-y-6">

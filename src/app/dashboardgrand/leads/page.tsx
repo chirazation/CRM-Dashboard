@@ -58,8 +58,6 @@ export default function LeadTable() {
       showAlert('error', 'Error while loading leads');
     } 
   }, []);
-
-
   useEffect(() => {
     loadLeads();
 }, [loadLeads]); 

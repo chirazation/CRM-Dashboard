@@ -5,54 +5,54 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription} from "@/comp
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-type Props = {
-  id: string;
+
+type Propsevent = {
+  id: string;  
   title: string;
   description: string;
   date: Date;
-  note?: string;
+  location?: string;
 };
 interface AlertState {
   show: boolean;
   type: 'success' | 'error';
   message: string;
 }
-export const ReminderCard = ({
+export const EventCard = ({
   id,
   title,
   description,
-  note,
+  location,
   date
-} : Props ) => {
-     const [alert, setAlert] = useState<AlertState>({ show: false, type: 'success', message: '' });
-      const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: number | null }>({
-        show: false,
-        id: null
-      });
-     const showAlert = (type: 'success' | 'error', message: string) => {
-      setAlert({ show: true, type, message });
-      setTimeout(() => setAlert({ show: false, type: 'success', message: '' }), 5000);
-    };
-     const handleDeleteConfirm = (id: number) => {
-      setDeleteConfirm({ show: true, id });
-    };
-    // Delete
-    const handleDelete = async () => {
-    if (!deleteConfirm.id) return;
-    try {
-      const res = await fetch(`/api/reminders/${deleteConfirm.id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Error deleting reminder');
-      showAlert('success', 'Reminder deleted successfully');
-      setDeleteConfirm({ show: false, id: null });
-    } catch (err) {
-      console.error('Error deleting reminder', err);
-      showAlert('error', 'Error while deleting reminder');
-    }
+} : Propsevent ) => {
+   const [alert, setAlert] = useState<AlertState>({ show: false, type: 'success', message: '' });
+    const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: number | null }>({
+      show: false,
+      id: null
+    });
+   const showAlert = (type: 'success' | 'error', message: string) => {
+    setAlert({ show: true, type, message });
+    setTimeout(() => setAlert({ show: false, type: 'success', message: '' }), 5000);
   };
-  // Update 
-  
+   const handleDeleteConfirm = (id: number) => {
+    setDeleteConfirm({ show: true, id });
+  };
+  // Delete
+  const handleDelete = async () => {
+  if (!deleteConfirm.id) return;
+  try {
+    const res = await fetch(`/api/events/${deleteConfirm.id}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Error deleting event');
+    showAlert('success', 'Event deleted successfully');
+    setDeleteConfirm({ show: false, id: null });
+  } catch (err) {
+    console.error('Error deleting event', err);
+    showAlert('error', 'Error while deleting event');
+  }
+};
+
   return (
      <Card className="text-sm shadow-md rounded-xl border gap-2 p-2">
       {/* Alerte */}
@@ -84,7 +84,7 @@ export const ReminderCard = ({
             <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
               <h3 className="text-lg font-semibold mb-4">Confirm deletion</h3>
               <p className="text-gray-600 mb-6">
-                Are you sure you want to delete the reminder? This action is irreversible.
+                Are you sure you want to delete the event? This action is irreversible.
               </p>
               <div className="flex gap-3 justify-end">
                 <button
@@ -107,27 +107,25 @@ export const ReminderCard = ({
       <CardHeader className="flex flex-row items-center justify-between ">
         <CardTitle className="text-base font-semibold truncate">{title}</CardTitle>
         <div className="flex ">
-          <Button size="icon" variant="ghost" className="h-6 w-6" >
-            <Pencil size={16} className="text-green-600 hover:text-green-900" />
+          <Button size="icon" variant="ghost" className="h-6 w-6">
+            <Pencil size={16} className=" text-green-600 hover:text-green-900" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteConfirm(Number(id))}>
-            <Trash2 size={16} className="text-red-600 hover:text-red-800" />
+          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteConfirm(Number(id))} >
+            <Trash2 size={16} className="text-red-600 hover:text-red-800"/>
           </Button>
         </div>
       </CardHeader>
-
       {description && (
         <CardDescription className="px-4 text-gray-500">
           {description}
         </CardDescription>
       )}
-
       <CardContent className="px-4 pt-2">
         <p className="text-muted-foreground">
-          Reminder set for: <span className="font-medium">{format(date, 'yyyy-MM-dd')}</span>
+          Event : {date ? format(new Date(date), 'yyyy-MM-dd') : 'No date set'}
         </p>
-        {note && (
-          <p className="mt-2 whitespace-pre-line text-gray-700">{note}</p>
+        {location && (
+          <p className="mt-2 whitespace-pre-line text-gray-700">{location}</p>
         )}
       </CardContent>
     </Card>

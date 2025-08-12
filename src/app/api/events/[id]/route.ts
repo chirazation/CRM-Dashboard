@@ -90,18 +90,15 @@ export async function DELETE(
   try {
     const { id: idParam } = await params;
     const id = parseInt(idParam);
-    
     if (isNaN(id)) {
       return NextResponse.json(
         { error: 'Invalid ID' },
         { status: 400 }
       );
     }
-
     await prisma.event.delete({
       where: { id }
     });
-
     return NextResponse.json({ message: 'Event deleted successfully' });
   } catch (error) {
     console.error('Error deleting event:', error);

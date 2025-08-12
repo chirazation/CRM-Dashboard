@@ -7,67 +7,71 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { CalendarDays } from 'lucide-react';
-import React from 'react';
-
-type ItemType = {
-  id: string;
-  time: string;
-  title: string;
-  desc: string;
-  color?: string;
-};
+import React , {useState} from 'react';
 
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
   description: z.string().min(1, "Description is required").max(500),
-  eventDate: z.date({ message: "Please select a reminder date" }),
+  eventDate: z.date({ message: "Please select an event date" }),
   location: z.string().optional(),
 });
-
 type EventFormValues = z.infer<typeof eventSchema>;
 
-export default function EventForm({
-  item,
-  onSave,
-  onCancel,
-}: {
-  item?: ItemType | null;
-  onSave: (data: Omit<ItemType, 'id'>) => void;
-  onCancel: () => void;
-}) {
-  const defaultDate = item?.time ? new Date(item.time) : new Date();
-
+export default function EventForm () {
   const form = useForm<EventFormValues>({
-    resolver: zodResolver(eventSchema),
-    defaultValues: {
-      title: item?.title || '',
-      description: item?.desc || '',
-      eventDate: defaultDate,
-      location: '',
-    },
-  });
+     resolver: zodResolver(eventSchema),
+     defaultValues: {
+       title: '',
+       description: '',
+       eventDate: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
+       location: '',
+     },
+   });
+  const { handleSubmit, control, reset } = form;
+  const [loading, setLoading] = useState(false);
+  // AddNewEvent
+    const onSubmit = async (data: EventFormValues) => {
+      setLoading(true);
+      try {
+        const localDate = new Date(
+        data.eventDate.getFullYear(),
+        data.eventDate.getMonth(),
+        data.eventDate.getDate(),
+        12, 0, 0 
+      );
+      const event= localDate.toISOString()
+      const submissionData = {...data,eventDate: event, };
+        const res = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(submissionData),
+        });
+  
+        if (!res.ok) throw new Error('Error saving event');
+        reset();
+  
+      } catch (err) {
+        console.error('Error saving event', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
 
-  const handleSubmit = (data: EventFormValues) => {
-    onSave({
-      title: data.title,
-      desc: data.description,
-      time: data.eventDate.toISOString(),
-      color: 'bg-blue-50 border-l-4 border-blue-400',
-    });
-  };
+
 
   return (
     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center flex items-center gap-2">
-            <CalendarDays className="text-gray-600" size={20} />
-            {item ? 'Edit event' : 'New event'}
-          </h2>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="flex items-center gap-3 mb-6">
+           <CalendarDays className="text-gray-600" size={20} />
+           <h1 className="text-xl font-medium text-gray-800">New Event</h1>
+      </div>
 
           {/* Title */}
           <FormField
-            control={form.control}
+            control={control}
             name="title"
             render={({ field }) => (
               <FormItem>
@@ -81,7 +85,7 @@ export default function EventForm({
 
           {/* Description */}
           <FormField
-            control={form.control}
+            control={control}
             name="description"
             render={({ field }) => (
               <FormItem>
@@ -94,19 +98,38 @@ export default function EventForm({
             )}/>
 
           {/* Date */}
-          <FormField
-            control={form.control}
-            name="eventDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date</FormLabel>
-                <FormControl>
-                  <Calendar mode="single" selected={field.value} onSelect={(date) => date && field.onChange(date)}/>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}/>
 
+          <FormField
+          control={control}
+          name="eventDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Event Date</FormLabel>
+              <FormControl>
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={(date) => {
+                      if (date) {
+                        const localDate = new Date(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate()
+                        );
+                        field.onChange(localDate);
+                      }
+                    }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                      return date < todayStart;
+                    }}
+                  />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
           {/* Location */}
           <FormField
             control={form.control}
@@ -120,10 +143,9 @@ export default function EventForm({
                 <FormMessage />
               </FormItem>
             )}/>
-          <div className="flex gap-2 pt-2">
-            <Button type="submit" className="flex-1 bg-[#12284C] text-white">{item ? 'Update Event' : 'Save Event'}</Button>
-            <Button type="button" onClick={onCancel} variant="outline" className="flex-1">Cancel</Button>
-          </div>
+          <Button type="submit" disabled={loading} className='bg-[#12284C]'>
+          {loading ? 'Saving...' : 'Save Event'}
+        </Button>
         </form>
       </Form>
     </div>

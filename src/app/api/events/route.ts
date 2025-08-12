@@ -9,13 +9,12 @@ const eventSchema = z.object({
   eventDate: z.date({message: "Please select an event date",}),
   location: z.string().optional(),
 });
-// GET 
 export async function GET(): Promise<NextResponse> {
   try {
     const events = await prisma.event.findMany({
       orderBy: { createdAt: 'desc' }
     });
-
+    console.log('events', events)
     return NextResponse.json({ events });
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -30,9 +29,12 @@ export async function GET(): Promise<NextResponse> {
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
+    if (typeof body.eventDate === 'string') {
+     body.eventDate = new Date(body.eventDate);
+    }
     const validatedData = eventSchema.parse(body);
     const { title, description, eventDate, location } = validatedData;
-    const newevent = await prisma.event.create({
+    const newEvent= await prisma.event.create({
       data: {
         title,
         description,
@@ -41,7 +43,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
     });
 
-    return NextResponse.json(newevent, { status: 201 });
+    return NextResponse.json(newEvent, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

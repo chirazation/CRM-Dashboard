@@ -31,11 +31,11 @@ const chartData = [
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "New leads",
     color: "var(--chart-1)",
   },
   mobile: {
-    label: "Mobile",
+    label: "Qualified leads",
     color: "var(--chart-2)",
   },
 } satisfies ChartConfig
@@ -46,7 +46,7 @@ export function ChartAreaGradient() {
       <CardHeader>
         <CardTitle>Area Chart - Gradient</CardTitle>
         <CardDescription>
-          Showing total visitors for the last 6 months
+          Showing leads variation for the last 6 months
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -120,7 +120,7 @@ export function ChartAreaGradient() {
               Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
             </div>
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              January - June 2024
+              January - June 2025
             </div>
           </div>
         </div>

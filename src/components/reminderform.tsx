@@ -25,7 +25,7 @@ export default function ReminderForm() {
     defaultValues: {
       title: '',
       description: '',
-      reminderDate: new Date(),
+      reminderDate: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()),
       note: '',
     },
   });
@@ -36,10 +36,23 @@ export default function ReminderForm() {
   const onSubmit = async (data: ReminderFormData) => {
     setLoading(true);
     try {
+      const localDate = new Date(
+        data.reminderDate.getFullYear(),
+        data.reminderDate.getMonth(),
+        data.reminderDate.getDate(),
+        12, 0, 0 
+      );
+      const reminder = localDate.toISOString()
+      console.log("reminder", reminder)
+      const submissionData = {
+        ...data,
+        reminderDate: reminder, 
+      };
+
       const res = await fetch('/api/reminders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submissionData),
       });
 
       if (!res.ok) throw new Error('Error saving reminder');
@@ -56,7 +69,7 @@ export default function ReminderForm() {
     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-6">
         <Bell className="text-gray-600" size={20} />
         <h1 className="text-xl font-medium text-gray-800">New reminder</h1>
       </div>
@@ -92,8 +105,22 @@ export default function ReminderForm() {
                 <Calendar
                   mode="single"
                   selected={field.value}
-                  onSelect={field.onChange}
-                />
+                  onSelect={(date) => {
+                      if (date) {
+                        const localDate = new Date(
+                          date.getFullYear(),
+                          date.getMonth(),
+                          date.getDate()
+                        );
+                        field.onChange(localDate);
+                      }
+                    }}
+                    disabled={(date) => {
+                      const today = new Date();
+                      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                      return date < todayStart;
+                    }}
+                  />
               </FormControl>
               <FormMessage />
             </FormItem>

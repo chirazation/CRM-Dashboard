@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient} from '@prisma/client';
 import { z } from 'zod';
+
 const prisma = new PrismaClient();
 const reminderSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
@@ -48,14 +49,12 @@ export async function PUT(
   try {
     const { id: idParam } = await params;
     const id = parseInt(idParam);
-    
     if (isNaN(id)) {
       return NextResponse.json(
         { error: 'Invalid ID' },
         { status: 400 }
       );
     }
-
     const body = await request.json();
     const validatedData = reminderSchema.parse(body);
 

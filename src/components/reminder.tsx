@@ -5,6 +5,7 @@ import { Plus, Calendar, Bell } from 'lucide-react';
 import EventForm from '@/components/eventform';
 import ReminderForm from '@/components/reminderform';
 import { ReminderCard } from './remindercard';
+import { EventCard } from './eventcard';
 
 type TabKey = 'Events' | 'Reminders';
 const tabs: TabKey[] = ['Events', 'Reminders'];
@@ -23,6 +24,7 @@ const buttonConfig = {
 };
 type Props = {
   reminders: Reminder[]
+  events: Event[]
 }
 export type Reminder = {
   id: string;
@@ -32,8 +34,16 @@ export type Reminder = {
   note: string;
   createdAt: Date;
 }
+export type Event = {
+  id: string;
+  title: string;
+  description: string;
+  eventDate: Date;
+  location: string;
+  createdAt: Date;
+}
 
-export default function CalendarTabs({ reminders } : Props) {
+export default function CalendarTabs({ reminders , events} : Props) {
   const [activeTab, setActiveTab] = useState<TabKey>('Events');
   const [showForm, setShowForm] = useState(false);
 
@@ -48,14 +58,14 @@ export default function CalendarTabs({ reminders } : Props) {
 
   const renderForm = () => {
     return activeTab === 'Events' ? (
-      <EventForm onCancel={handleCloseForm} onSave={handleCloseForm} />
+      <EventForm/>
     ) : (
       <ReminderForm />
     );
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gray-50">
+    <div className="flex min-h-screen p-4 bg-gray-50 justify-center items-center ">
       <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 w-full max-w-lg">
         {/* Header Section */}
         <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 px-6 py-6 text-white relative overflow-hidden">
@@ -96,8 +106,21 @@ export default function CalendarTabs({ reminders } : Props) {
         <div className="px-4 pb-4 overflow-y-auto">
           <div className="min-h-[160px] mb-4">
             {activeTab === 'Events' ? (
-              <div className="flex items-center justify-center h-40 text-gray-500 text-sm italic bg-gray-50 rounded-lg">
-                No events to display.
+              <div className="bg-gray-50 rounded-lg  min-h-[160px] gap-4 ">
+                <div className='flex flex-col gap-2 max-h-60 overflow-y-auto'>
+                  {events.map((event) => {
+                  return (
+                    <EventCard 
+                      key={event.id}
+                      id={event.id} 
+                      title={event.title}
+                      description={event.description}
+                      date={event.eventDate}
+                      location={event.location}
+                    />
+                  )
+                })}
+                </div>
               </div>
             ) : (
               <div className="bg-gray-50 rounded-lg  min-h-[160px] gap-4 ">
@@ -106,6 +129,7 @@ export default function CalendarTabs({ reminders } : Props) {
                   return (
                     <ReminderCard 
                       key={reminder.id}
+                      id={reminder.id} 
                       title={reminder.title}
                       description={reminder.description}
                       date={reminder.reminderDate}

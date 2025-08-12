@@ -32,7 +32,6 @@ export async function GET(): Promise<NextResponse> {
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
-    // Convertir reminderDate en Date si c’est une string
     if (typeof body.reminderDate === 'string') {
      body.reminderDate = new Date(body.reminderDate);
     }
