@@ -5,7 +5,7 @@ import { Calendar, Bell, CheckSquare, TrendingUp } from 'lucide-react';
 export default function RecentActivity() {
   const activities = [
     { action: 'Created new event', item: 'Team Meeting', time: '2 min ago', icon: Calendar, color: 'text-blue-600' },
-    { action: 'Completed task', item: 'Review Documents', time: '1 hour ago', icon: CheckSquare, color: 'text-green-600' },
+    { action: 'Completed event', item: 'Review Documents', time: '1 hour ago', icon: CheckSquare, color: 'text-green-600' },
     { action: 'Set reminder', item: 'Call Client', time: '3 hours ago', icon: Bell, color: 'text-orange-600' },
   ];
 

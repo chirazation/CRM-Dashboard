@@ -19,52 +19,58 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-export const description = "A donut chart with text"
+// Chart config for ShadCN styling
+const chartConfig: ChartConfig = {
+  visitors: { label: "Leads" },
+  linkedin: { label: "LinkedIn", color: "var(--chart-1)" },
+  website: { label: "Website",  color: "var(--chart-2)" },
+  email: { label: "Email",      color: "var(--chart-3)" },
+  referral: { label: "Referral", color: "var(--chart-4)" },
+  ads: { label: "Ads",          color: "var(--chart-5)" },
+}
 
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
-]
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "var(--chart-1)",
-  },
-  safari: {
-    label: "Safari",
-    color: "var(--chart-2)",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "var(--chart-3)",
-  },
-  edge: {
-    label: "Edge",
-    color: "var(--chart-4)",
-  },
-  other: {
-    label: "Other",
-    color: "var(--chart-5)",
-  },
-} satisfies ChartConfig
+type LeadSource = 'linkedin' | 'website' | 'email' | 'referral' | 'ads'
+type LeadData = { source: LeadSource; leads: number }
 
 export function ChartPieDonutText() {
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0)
+  const [chartData, setChartData] = React.useState<LeadData[]>([])
+  const [totalLeads, setTotalLeads] = React.useState(0)
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const res = await fetch("/api/leadsource") 
+        const json: { total: number; data: LeadData[] } = await res.json()
+
+        // Fill missing sources with 0
+        const allSources: LeadSource[] = ['linkedin', 'website', 'email', 'referral', 'ads']
+        const normalized = allSources.map(s => {
+          const found = json.data.find(d => d.source === s)
+          return { source: s, leads: found?.leads ?? 0 }
+        })
+
+        setChartData(normalized)
+        setTotalLeads(json.total)
+      } catch (err) {
+        console.error(err)
+        setChartData([])
+        setTotalLeads(0)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
   }, [])
 
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart - Donut with Text</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Lead Sources</CardTitle>
+        <CardDescription>March - August 2024</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -77,11 +83,12 @@ export function ChartPieDonutText() {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
+              data={chartData.map(d => ({ ...d, fill: `var(--chart-${['linkedin','website','email','referral','ads'].indexOf(d.source)+1})` }))}
+              dataKey="leads"
+              nameKey="source"
               innerRadius={60}
               strokeWidth={5}
+              isAnimationActive
             >
               <Label
                 content={({ viewBox }) => {
@@ -98,14 +105,14 @@ export function ChartPieDonutText() {
                           y={viewBox.cy}
                           className="fill-foreground text-3xl font-bold"
                         >
-                          {totalVisitors.toLocaleString()}
+                          {loading ? '...' : totalLeads.toLocaleString()}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          Total leads
                         </tspan>
                       </text>
                     )
@@ -121,7 +128,7 @@ export function ChartPieDonutText() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none">
-          Showing total visitors for the last 6 months
+          Showing lead sources for the last 6 months
         </div>
       </CardFooter>
     </Card>

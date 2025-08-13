@@ -14,12 +14,12 @@ const buttonConfig = {
   Events: {
     text: 'Add New Event',
     icon: Calendar,
-    gradient: 'bg-gradient-to-r from-blue-900 to-blue-800 hover:from-blue-700 hover:to-blue-800'
+    gradient: 'bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800'
   },
   Reminders: {
     text: 'Add New Reminder',
     icon: Bell,
-    gradient: 'bg-gradient-to-r from-green-900 to-green-800 hover:from-green-700 hover:to-green-800'
+    gradient: 'bg-gradient-to-r from-green-700 via-green-600 to-green-700 hover:from-green-600 hover:to-green-800'
   }
 };
 type Props = {
@@ -65,32 +65,33 @@ export default function CalendarTabs({ reminders , events} : Props) {
   };
 
   return (
-    <div className="flex min-h-screen p-4 bg-gray-50 justify-center items-center ">
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200 w-full max-w-lg">
+    <div className="flex min-h-screen p-4 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 justify-center items-center">
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-lg overflow-hidden border border-white/30 w-full max-w-lg transition-all duration-300 hover:shadow-xl">
+        
         {/* Header Section */}
-        <div className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 px-6 py-6 text-white relative overflow-hidden">
+        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-6 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
           <div className="relative text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl mb-3">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-white/15 backdrop-blur-md rounded-xl mb-3 shadow-inner">
               <span className="text-2xl font-bold">{dayNum}</span>
             </div>
-            <h2 className="text-xl font-semibold mb-1">{month}</h2>
+            <h2 className="text-2xl font-semibold mb-1 tracking-wide">{month}</h2>
             <p className="text-slate-300 text-sm font-medium">{day}</p>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-4 py-4 bg-gray-50/50">
-          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg" role="group">
+        <div className="px-4 py-4 bg-gray-50/70">
+          <div className="flex gap-1 p-1 bg-gray-100 rounded-xl shadow-inner" role="group">
             {tabs.map((tab) => {
               const Icon = tabIcons[tab];
               return (
                 <button
                   key={tab}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md font-medium text-sm transition-all duration-300 ${
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
                     activeTab === tab
-                      ? 'bg-white text-slate-800 shadow-sm transform scale-[1.02]'
-                      : 'text-gray-600 hover:text-slate-700 hover:bg-white/50'
+                      ? 'bg-white text-slate-800 shadow-md transform scale-[1.03]'
+                      : 'text-gray-600 hover:text-slate-700 hover:bg-white/40'
                   }`}
                   onClick={() => setActiveTab(tab)}
                 >
@@ -106,10 +107,9 @@ export default function CalendarTabs({ reminders , events} : Props) {
         <div className="px-4 pb-4 overflow-y-auto">
           <div className="min-h-[160px] mb-4">
             {activeTab === 'Events' ? (
-              <div className="bg-gray-50 rounded-lg  min-h-[160px] gap-4 ">
-                <div className='flex flex-col gap-2 max-h-60 overflow-y-auto'>
-                  {events.map((event) => {
-                  return (
+              <div className="bg-gray-50/80 rounded-xl min-h-[160px] p-2 shadow-inner">
+                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+                  {events.map((event) => (
                     <EventCard 
                       key={event.id}
                       id={event.id} 
@@ -118,15 +118,13 @@ export default function CalendarTabs({ reminders , events} : Props) {
                       date={event.eventDate}
                       location={event.location}
                     />
-                  )
-                })}
+                  ))}
                 </div>
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-lg  min-h-[160px] gap-4 ">
-                <div className='flex flex-col gap-2 max-h-60 overflow-y-auto'>
-                  {reminders.map((reminder) => {
-                  return (
+              <div className="bg-gray-50/80 rounded-xl min-h-[160px] p-2 shadow-inner">
+                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+                  {reminders.map((reminder) => (
                     <ReminderCard 
                       key={reminder.id}
                       id={reminder.id} 
@@ -135,8 +133,7 @@ export default function CalendarTabs({ reminders , events} : Props) {
                       date={reminder.reminderDate}
                       note={reminder.note}
                     />
-                  )
-                })}
+                  ))}
                 </div>
               </div>
             )}
@@ -144,7 +141,7 @@ export default function CalendarTabs({ reminders , events} : Props) {
 
           {/* Add Button */}
           <button
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg text-white font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${buttonConfig[activeTab].gradient}`}
+            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${buttonConfig[activeTab].gradient}`}
             onClick={() => setShowForm(true)}
           >
             <Plus size={16} />
@@ -160,7 +157,7 @@ export default function CalendarTabs({ reminders , events} : Props) {
             className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-all duration-300"
             onClick={handleCloseForm}
           ></div>
-          <div className="relative bg-white rounded-2xl w-full max-w-md shadow-2xl transform transition-all duration-300 scale-100 max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white/70 backdrop-blur-lg rounded-3xl w-full max-w-md shadow-2xl transform transition-all duration-300 scale-100 max-h-[90vh] overflow-y-auto border border-white/30">
             {activeTab === 'Events' && (
               <button
                 onClick={handleCloseForm}

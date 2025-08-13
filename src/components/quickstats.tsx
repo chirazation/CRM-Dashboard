@@ -3,7 +3,7 @@ import { Calendar, Bell, CheckSquare } from 'lucide-react';
 export default function QuickStats() {
   const stats = [
     { label: 'Today\'s Events', value: '4', icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Pending Tasks', value: '7', icon: CheckSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'Upcoming Events', value: '7', icon: CheckSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
     { label: 'Reminders', value: '3', icon: Bell, color: 'text-green-600', bg: 'bg-green-50' },
   ];
 

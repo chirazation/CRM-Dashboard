@@ -1,15 +1,17 @@
-"use server";
 import React from 'react';
 import {Calendar17} from '@/components/calendar-17';
 import CalendarTabs from '@/components/reminder';
 import RecentActivity from '@/components/statereminder';
 import QuickStats from '@/components/quickstats';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function RemindersPage() {
-  const data = await fetch('http://localhost:3000/api/reminders');
+  const data = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/reminders`);
   const remindersData = await data.json();
-  const dataevent = await fetch('http://localhost:3000/api/events');
-  const eventsData = await dataevent.json();
+  const dataevent = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/events`);
+  const eventsData = await dataevent.json(); 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">

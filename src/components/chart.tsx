@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import useSWR from "swr";
+import { TrendingUp } from "lucide-react";
+import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
 
 import {
   Card,
@@ -10,37 +11,37 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
+  ChartConfig,
+} from "@/components/ui/chart";
 
-export const description = "An area chart with gradient fill"
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+export default function ChartAreaGradient() {
+  const { data, error } = useSWR("/api/leads-stats", fetcher, {
+    refreshInterval: 5000,
+  });
 
-const chartConfig = {
-  desktop: {
-    label: "New leads",
-    color: "var(--chart-1)",
-  },
-  mobile: {
-    label: "Qualified leads",
-    color: "var(--chart-2)",
-  },
-} satisfies ChartConfig
+  if (error) return <p>Failed to load data</p>;
+  if (!data) return <p>Loading...</p>;
 
-export function ChartAreaGradient() {
+  const { months, trend } = data;
+
+  const chartConfig: ChartConfig = {
+    desktop: {
+      label: "New leads",
+      color: "var(--chart-1)",
+    },
+    mobile: {
+      label: "Qualified leads  ",
+      color: "var(--chart-2)",
+    },
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -53,7 +54,7 @@ export function ChartAreaGradient() {
         <ChartContainer config={chartConfig}>
           <AreaChart
             accessibilityLayer
-            data={chartData}
+            data={months}
             margin={{
               left: 12,
               right: 12,
@@ -65,7 +66,7 @@ export function ChartAreaGradient() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value:string) => value.slice(0, 3)}
+              tickFormatter={(value: string) => value.slice(0, 3)}
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
@@ -117,14 +118,21 @@ export function ChartAreaGradient() {
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+              Trending {trend >= 0 ? "up" : "down"} by {trend.toFixed(1)}% this
+              month{" "}
+              <TrendingUp
+                className={`h-4 w-4 ${
+                  trend >= 0 ? "text-green-500" : "text-red-500"
+                }`}
+              />
             </div>
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              January - June 2025
+              January - {months[months.length - 1].month}{" "}
+              {new Date().getFullYear()}
             </div>
           </div>
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

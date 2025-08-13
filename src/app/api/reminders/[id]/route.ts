@@ -10,7 +10,7 @@ const reminderSchema = z.object({
   note: z.string().optional(),
 });
 // GET 
-export async function GET(
+export async function GET( request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
     try {
