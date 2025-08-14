@@ -1,10 +1,25 @@
-import React from 'react';
-import { Calendar, Bell, CheckSquare } from 'lucide-react';
+'use client';
+import React,{useState,useEffect} from 'react'
+import { Calendar, Bell ,CalendarCheck} from 'lucide-react';
 export default function QuickStats() {
+  const [counts, setCounts] = useState({
+           todayreminders: 0,
+           upcomevent: 0,
+           todayevents: 0,
+        });
+      
+        useEffect(() => {
+          const fetchStats = async () => {
+            const res = await fetch('/api/topstatreminder');
+            const data = await res.json();
+            setCounts(data);
+          };
+          fetchStats();
+        }, []);
   const stats = [
-    { label: 'Today\'s Events', value: '4', icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Upcoming Events', value: '7', icon: CheckSquare, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'Reminders', value: '3', icon: Bell, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Today\'s Events', icon: Calendar, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Today\'s Reminders', icon: Bell, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'Upcoming Events', icon: CalendarCheck, color: 'text-green-600', bg: 'bg-green-50' },
   ];
 
   return (
@@ -14,7 +29,11 @@ export default function QuickStats() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-lg font-medium text-gray-600 mb-1">{stat.label}</p>
-              <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-xl font-bold text-gray-900">
+               {stat.label === "Today's Events" ? counts.todayevents :
+                stat.label === "Today's Reminders" ? counts.todayreminders :
+                counts.upcomevent}
+              </p>
             </div>
             <div className={`w-12 h-12 rounded-xl ${stat.bg} flex items-center justify-center`}>
               <stat.icon className={`w-6 h-6 ${stat.color}`} />

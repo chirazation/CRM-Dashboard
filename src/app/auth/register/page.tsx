@@ -26,7 +26,7 @@ export default function SignUp() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState<{ name: string } | null>(null); // 🆕 ajouté
+  const [user, setUser] = useState<{ name: string } | null>(null);
 
   const {
     register,
@@ -59,7 +59,7 @@ export default function SignUp() {
         setUser(json.user); 
         setError('');
         if (json.user) {
-          router.push('/dashboardgrand');
+          router.push('/auth/login');
         }
       } else {
         setError(json.message || 'An error occurred.');
