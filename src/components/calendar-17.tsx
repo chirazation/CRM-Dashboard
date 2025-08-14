@@ -59,14 +59,8 @@ export function Calendar17() {
     <Card className="w-full bg-white/60 backdrop-blur-lg border border-white/30 rounded-3xl shadow-lg transition-all duration-300 hover:shadow-xl">
       <CardContent className="px-4 py-6 text-center">
         {/* Calendar */}
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          required={false}
-          className="bg-transparent p-0 [--cell-size:--spacing(10.5)]"
-        />
-
+        <Calendar mode="single" selected={date} onSelect={setDate} required={false} 
+        className="bg-transparent p-0 [--cell-size:--spacing(10.5)]" />
         {/* Loading State */}
         {loading && (
           <p className="mt-4 text-gray-500 animate-pulse text-sm">Loading...</p>
