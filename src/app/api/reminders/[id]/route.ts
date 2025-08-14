@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient} from '@prisma/client';
 import { z } from 'zod';
+import { parseISO } from 'date-fns';
 
 const prisma = new PrismaClient();
 const reminderSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
   description: z.string().min(1, "Description is required").max(500),
-  reminderDate: z.date({message: "Please select a reminder date",}),
+  reminderDate: z
+    .string()
+    .transform((str) => parseISO(str))
+    .refine((date) => !isNaN(date.getTime()), {
+      message: "Please select a valid reminder date",
+    }),
   note: z.string().optional(),
 });
 // GET 

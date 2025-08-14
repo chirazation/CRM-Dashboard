@@ -1,3 +1,4 @@
+'use client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { CalendarDays } from 'lucide-react';
-import React , {useState} from 'react';
+import { CalendarDays , Pencil} from 'lucide-react';
+import React , {useState,useEffect} from 'react';
 
 const eventSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
@@ -16,8 +17,25 @@ const eventSchema = z.object({
   location: z.string().optional(),
 });
 type EventFormValues = z.infer<typeof eventSchema>;
+interface EventFormProps {
+  editMode?: boolean;
+  editData?: {
+    id: string;
+    title: string;
+    description: string;
+    date: Date;
+    location?: string;
+  };
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
 
-export default function EventForm () {
+export default function EventForm ({
+  editMode = false, 
+  editData, 
+  onSuccess, 
+  onCancel 
+}: EventFormProps) {
   const form = useForm<EventFormValues>({
      resolver: zodResolver(eventSchema),
      defaultValues: {
@@ -29,7 +47,18 @@ export default function EventForm () {
    });
   const { handleSubmit, control, reset } = form;
   const [loading, setLoading] = useState(false);
-  // AddNewEvent
+
+    useEffect(() => {
+      if (editMode && editData) {
+        reset({
+          title: editData.title,
+          description: editData.description,
+          eventDate: editData.date,
+          location: editData.location || '',
+        });
+      }
+    }, [editMode, editData, reset]);
+  
     const onSubmit = async (data: EventFormValues) => {
       setLoading(true);
       try {
@@ -39,35 +68,44 @@ export default function EventForm () {
         data.eventDate.getDate(),
         12, 0, 0 
       );
-      const event= localDate.toISOString()
-      const submissionData = {...data,eventDate: event, };
-        const res = await fetch('/api/events', {
-          method: 'POST',
+      const submissionData = {...data, eventDate: localDate, };
+      const url = editMode ? `/api/events/${editData?.id}` : '/api/events';
+      const method = editMode ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+          method: method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(submissionData),
         });
   
-        if (!res.ok) throw new Error('Error saving event');
+        if (!res.ok) {const errorText = await res.text();
+        console.log('Error response:', errorText);
+        throw new Error(`Error ${editMode ? 'updating' : 'saving'} event: ${res.status} - ${errorText}`);}
+        if (!editMode) {
         reset();
+        }
+        onSuccess?.();
   
       } catch (err) {
-        console.error('Error saving event', err);
+        console.error(`Error ${editMode ? 'updating' : 'saving'} event`, err);
       } finally {
         setLoading(false);
       }
     };
   
-
-
-
   return (
     <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex items-center gap-3 mb-6">
-           <CalendarDays className="text-gray-600" size={20} />
-           <h1 className="text-xl font-medium text-gray-800">New Event</h1>
-      </div>
+            {editMode ? (
+              <Pencil className="text-gray-600" size={20} />
+            ) : (
+              <CalendarDays className="text-gray-600" size={20} />
+            )}
+            <h1 className="text-xl font-medium text-gray-800">
+              {editMode ? 'Edit event' : 'New event'}
+            </h1>
+          </div>
 
           {/* Title */}
           <FormField
@@ -98,7 +136,6 @@ export default function EventForm () {
             )}/>
 
           {/* Date */}
-
           <FormField
           control={control}
           name="eventDate"
@@ -143,9 +180,28 @@ export default function EventForm () {
                 <FormMessage />
               </FormItem>
             )}/>
-          <Button type="submit" disabled={loading} className='bg-[#12284C]'>
-          {loading ? 'Saving...' : 'Save Event'}
-        </Button>
+                  <div className="flex gap-3">
+            {editMode && onCancel && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onCancel}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+            )}
+            <Button 
+              type="submit" 
+              disabled={loading} 
+              className={`bg-[#12284C] ${editMode ? 'flex-1' : ''}`}
+            >
+              {loading 
+                ? (editMode ? 'Updating...' : 'Saving...') 
+                : (editMode ? 'Update Event' : 'Save Event')
+              }
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

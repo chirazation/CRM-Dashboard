@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription} from "@/comp
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import EventForm from "@/components/eventform";
 
 type Propsevent = {
   id: string;  
@@ -12,6 +13,7 @@ type Propsevent = {
   description: string;
   date: Date;
   location?: string;
+  onUpdate?: () => void;
 };
 interface AlertState {
   show: boolean;
@@ -23,19 +25,31 @@ export const EventCard = ({
   title,
   description,
   location,
-  date
+  date,
+  onUpdate
 } : Propsevent ) => {
-   const [alert, setAlert] = useState<AlertState>({ show: false, type: 'success', message: '' });
+    const [alert, setAlert] = useState<AlertState>({ show: false, type: 'success', message: '' });
     const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; id: number | null }>({
       show: false,
       id: null
     });
+    const [showEditForm, setShowEditForm] = useState(false);
    const showAlert = (type: 'success' | 'error', message: string) => {
     setAlert({ show: true, type, message });
     setTimeout(() => setAlert({ show: false, type: 'success', message: '' }), 5000);
   };
    const handleDeleteConfirm = (id: number) => {
     setDeleteConfirm({ show: true, id });
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditForm(false);
+    showAlert('success', 'Event updated successfully');
+    onUpdate?.(); 
+  };
+
+  const handleEditCancel = () => {
+    setShowEditForm(false);
   };
   // Delete
   const handleDelete = async () => {
@@ -77,6 +91,27 @@ export const EventCard = ({
           </button>
         </div>
       )} 
+      {/* Edit Form Modal */}
+            {showEditForm && (
+              <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-all duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div className="max-h-[90vh] overflow-y-auto">
+                    <EventForm
+                      editMode={true}
+                      editData={{
+                        id,
+                        title,
+                        description,
+                        date,
+                        location
+                      }}
+                      onSuccess={handleEditSuccess}
+                      onCancel={handleEditCancel}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
       {/* Modal de confirmation de suppression */}
         {deleteConfirm.show && (
           <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-all duration-300">
@@ -107,7 +142,7 @@ export const EventCard = ({
       <CardHeader className="flex flex-row items-center justify-between ">
         <CardTitle className="text-base font-semibold truncate">{title}</CardTitle>
         <div className="flex ">
-          <Button size="icon" variant="ghost" className="h-6 w-6">
+          <Button size="icon" variant="ghost" className="h-6 w-6 " onClick={() => setShowEditForm(true)} >
             <Pencil size={16} className=" text-green-600 hover:text-green-900" />
           </Button>
           <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => handleDeleteConfirm(Number(id))} >

@@ -9,7 +9,7 @@ export default function DashboardPage() {
   <TopCards />
   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
     <section aria-label="Area Chart"
-      className="lg:col-span-2 w-full max-w-full mx-auto lg:mx-0  bg-white border rounded-lg p-2 shadow-sm">
+      className=" w-full max-w-full mx-auto lg:col-span-2 lg:mx-0  bg-white border rounded-lg p-2 shadow-sm">
       <ChartAreaGradient />
     </section>
     <aside aria-label="Summary and Status"
