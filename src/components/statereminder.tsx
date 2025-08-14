@@ -25,13 +25,14 @@ export default function RecentActivity() {
 
         formattedActivities.push({
         action: data.latestPassedEvent ? 'Past event' : 'No past event',
-        item: data.latestPassedEvent?.name || '—',
-        time: data.latestPassedEvent? formatTimeAgo(new Date(data.latestPassedEvent.eventDate), now): '-',icon: CheckSquare,
+        item: data.latestPassedEvent?.title || '—',
+        time: data.latestPassedEvent? formatTimeAgo(new Date(data.latestPassedEvent.eventDate), now): '-',
+        icon: CheckSquare,
         color: data.latestPassedEvent ?'text-green-600' : 'text-gray-400',
         });
         formattedActivities.push({
         action: data.latestEvent ? 'Created new event' : 'No event',
-        item: data.latestEvent?.name || '—',
+        item: data.latestEvent?.title || '—',
         time: data.latestEvent? formatTimeAgo(new Date(data.latestEvent.createdAt), now): '-',
         icon: Calendar,
         color: data.latestEvent ? 'text-blue-600' : 'text-gray-400',
