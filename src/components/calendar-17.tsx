@@ -22,7 +22,7 @@ type ReminderType = {
 };
 
 export function Calendar17() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date(2025, 5, 12));
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [events, setEvents] = React.useState<EventType[]>([]);
   const [reminders, setReminders] = React.useState<ReminderType[]>([]);
   const [loading, setLoading] = React.useState(false);

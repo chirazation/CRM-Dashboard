@@ -1,187 +1,233 @@
-// // pages/profile.tsx
-// "use client";
-// import React, { useState } from "react";
-// import { Camera, Mail, User, Lock } from "lucide-react";
+"use client";
+import React, { useState, useEffect } from "react";
+import { User, Mail, Lock } from "lucide-react";
 
-// const Profile = () => {
-//   const [profile, setProfile] = useState({
-//     name: "John Doe",
-//     email: "john.doe@example.com",
-//     notifications: {
-//       reminders: true,
-//       dailySummary: false,
-//       leadAssignment: true,
-//     },
-//   });
+interface ProfileData {
+  id?: number;
+  name: string;
+  email: string;
+}
 
-//   const [password, setPassword] = useState({
-//     current: "",
-//     new: "",
-//     confirm: "",
-//   });
+const Profile = () => {
+  const [profile, setProfile] = useState<ProfileData>({ name: "", email: "" });
+  const [password, setPassword] = useState<{ new: string; confirm: string }>({
+    new: "",
+    confirm: ""
+  });
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
-//   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target;
-//     setProfile({ ...profile, [name]: value });
-//   };
 
-//   const handleNotificationToggle = (key: string) => {
-//     setProfile({
-//       ...profile,
-//       notifications: {
-//         ...profile.notifications,
-//         [key]: !profile.notifications[key as keyof typeof profile.notifications],
-//       },
-//     });
-//   };
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/signup"); 
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        setProfile({ 
+          id: data.id,
+          name: data.name || "", 
+          email: data.email || "" 
+        });
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+        alert("Failed to load profile data");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
 
-//   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target;
-//     setPassword({ ...password, [name]: value });
-//   };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfile({ ...profile, [e.target.name]: e.target.value });
+  };
 
-//   const handleSave = () => {
-//     // Add save logic here (API call)
-//     console.log("Profile saved:", profile, password);
-//     alert("Profile changes saved!");
-//   };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword({ ...password, [e.target.name]: e.target.value });
+  };
 
-//   return (
-//     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-12">
-//       <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-10">
-//         <h1 className="text-4xl font-bold text-[#12284C] mb-6">My Profile</h1>
+  const handleSave = async () => {
+    if (!profile.name.trim() || !profile.email.trim()) {
+      alert("Name and email are required");
+      return;
+    }
 
-//         {/* Profile Info */}
-//         <div className="mb-8">
-//           <h2 className="text-2xl font-semibold text-[#12284C] mb-4">Profile Information</h2>
-//           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-center">
-//             <div className="flex flex-col items-center sm:items-start">
-//               <div className="relative w-32 h-32 mb-2">
-//                 <img
-//                   src="/avatar-placeholder.png"
-//                   alt="Profile Picture"
-//                   className="w-32 h-32 rounded-full object-cover border-2 border-[#12284C]"
-//                 />
-//                 <button className="absolute bottom-0 right-0 bg-[#12284C] p-2 rounded-full text-white hover:bg-[#0f1f3a] transition">
-//                   <Camera className="w-5 h-5" />
-//                 </button>
-//               </div>
-//               <span className="text-gray-600 text-sm">Click camera to change</span>
-//             </div>
-//             <div className="sm:col-span-2 space-y-4">
-//               <div>
-//                 <label className="block text-gray-700 font-medium mb-1 flex items-center gap-2">
-//                   <User className="w-5 h-5 text-[#12284C]" /> Full Name
-//                 </label>
-//                 <input
-//                   type="text"
-//                   name="name"
-//                   value={profile.name}
-//                   onChange={handleProfileChange}
-//                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#12284C] outline-none"
-//                 />
-//               </div>
-//               <div>
-//                 <label className="block text-gray-700 font-medium mb-1 flex items-center gap-2">
-//                   <Mail className="w-5 h-5 text-[#12284C]" /> Email
-//                 </label>
-//                 <input
-//                   type="email"
-//                   name="email"
-//                   value={profile.email}
-//                   onChange={handleProfileChange}
-//                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#12284C] outline-none"
-//                 />
-//               </div>
-//             </div>
-//           </div>
-//         </div>
+    if (password.new && password.new !== password.confirm) {
+      alert("Passwords do not match");
+      return;
+    }
 
-//         {/* Password Change */}
-//         <div className="mb-8">
-//           <h2 className="text-2xl font-semibold text-[#12284C] mb-4">Change Password</h2>
-//           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-//             <div className="sm:col-span-3 space-y-4">
-//               <div>
-//                 <label className="block text-gray-700 font-medium mb-1 flex items-center gap-2">
-//                   <Lock className="w-5 h-5 text-[#12284C]" /> Current Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   name="current"
-//                   value={password.current}
-//                   onChange={handlePasswordChange}
-//                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#12284C] outline-none"
-//                 />
-//               </div>
-//               <div>
-//                 <label className="block text-gray-700 font-medium mb-1 flex items-center gap-2">
-//                   <Lock className="w-5 h-5 text-[#12284C]" /> New Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   name="new"
-//                   value={password.new}
-//                   onChange={handlePasswordChange}
-//                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#12284C] outline-none"
-//                 />
-//               </div>
-//               <div>
-//                 <label className="block text-gray-700 font-medium mb-1 flex items-center gap-2">
-//                   <Lock className="w-5 h-5 text-[#12284C]" /> Confirm New Password
-//                 </label>
-//                 <input
-//                   type="password"
-//                   name="confirm"
-//                   value={password.confirm}
-//                   onChange={handlePasswordChange}
-//                   className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#12284C] outline-none"
-//                 />
-//               </div>
-//             </div>
-//           </div>
-//         </div>
+    try {
+      setUpdating(true);
+      const updateData: { name: string; email: string; password?: string } = {
+        name: profile.name,
+        email: profile.email
+      };
+      if (password.new) {
+        updateData.password = password.new;
+      }
 
-//         {/* Notifications */}
-//         <div className="mb-8">
-//           <h2 className="text-2xl font-semibold text-[#12284C] mb-4">Email Notifications</h2>
-//           <div className="space-y-4">
-//             {Object.entries(profile.notifications).map(([key, value]) => (
-//               <div key={key} className="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
-//                 <span className="capitalize text-gray-800">{key.replace(/([A-Z])/g, " $1")}</span>
-//                 <label className="relative inline-flex items-center cursor-pointer">
-//                   <input
-//                     type="checkbox"
-//                     checked={value}
-//                     onChange={() => handleNotificationToggle(key)}
-//                     className="sr-only peer"
-//                   />
-//                   <div className="w-11 h-6 bg-gray-300 peer-focus:ring-2 peer-focus:ring-[#12284C] rounded-full peer peer-checked:bg-[#12284C] transition"></div>
-//                   <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
-//                 </label>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
+      const res = await fetch(`/api/signup/${profile.id}`, { 
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
 
-//         {/* Save Button */}
-//         <div className="text-center">
-//           <button
-//             onClick={handleSave}
-//             className="bg-[#12284C] text-white font-semibold px-8 py-3 rounded-xl hover:bg-[#0f1f3a] transition"
-//           >
-//             Save Changes
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
 
-// export default Profile;
+      alert("Profile updated successfully!");
+      setShowForm(false);
+      setPassword({ new: "", confirm: "" }); 
+    } catch (err) {
+      console.error("Update failed:", err);
+      alert("Failed to update profile");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
-import React from 'react';
-export default function Profile() {
-  return (
-    <h1>Profile</h1>);
+  const handleModifyClick = () => {
+    setShowForm(true);
+    setPassword({ new: "", confirm: "" });
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setPassword({ new: "", confirm: "" });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-600">Loading profile...</div>
+      </div>
+    );
   }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">My Profile</h1>
+
+        {!showForm && (
+          <div className="space-y-4">
+            {/* Display current profile info */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center mb-2">
+                <User className="w-4 h-4 text-gray-500 mr-2" />
+                <span className="font-medium text-gray-700">Name:</span>
+                <span className="ml-2 text-gray-600">{profile.name || "Not set"}</span>
+              </div>
+              <div className="flex items-center">
+                <Mail className="w-4 h-4 text-gray-500 mr-2" />
+                <span className="font-medium text-gray-700">Email:</span>
+                <span className="ml-2 text-gray-600">{profile.email || "Not set"}</span>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <button
+                onClick={handleModifyClick}
+                className="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-900 transition"
+              >
+                Modify Profile
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showForm && (
+          <div className="space-y-4">
+            {/* Name */}
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-400">
+                <User className="w-5 h-5" />
+              </span>
+              <input
+                type="text"
+                name="name"
+                value={profile.name}
+                onChange={handleChange}
+                placeholder="Full Name"
+                className="w-full pl-10 border px-3 py-2 rounded-md focus:ring-2 focus:ring-gray-700 outline-none"
+                required
+              />
+            </div>
+
+            {/* Email */}
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-400">
+                <Mail className="w-5 h-5" />
+              </span>
+              <input
+                type="email"
+                name="email"
+                value={profile.email}
+                onChange={handleChange}
+                placeholder="Email"
+                className="w-full pl-10 border px-3 py-2 rounded-md focus:ring-2 focus:ring-gray-700 outline-none"
+                required
+              />
+            </div>
+
+            {/* New Password */}
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-400">
+                <Lock className="w-5 h-5" />
+              </span>
+              <input
+                type="password"
+                name="new"
+                value={password.new}
+                onChange={handlePasswordChange}
+                placeholder="New Password (optional)"
+                className="w-full pl-10 border px-3 py-2 rounded-md focus:ring-2 focus:ring-gray-700 outline-none"
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-400">
+                <Lock className="w-5 h-5" />
+              </span>
+              <input
+                type="password"
+                name="confirm"
+                value={password.confirm}
+                onChange={handlePasswordChange}
+                placeholder="Confirm Password"
+                className="w-full pl-10 border px-3 py-2 rounded-md focus:ring-2 focus:ring-gray-700 outline-none"
+              />
+            </div>
+
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handleSave}
+                disabled={updating}
+                className="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updating ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={updating}
+                className="border px-6 py-2 rounded-md hover:bg-gray-100 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Profile;

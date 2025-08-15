@@ -2,27 +2,11 @@
 import React, { useCallback,useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Trash2, Edit2, AlertCircle, CheckCircle } from "lucide-react";
-import LeadForm from "@/components/formlead";
-import { LeadStatus} from '@prisma/client';
-import { LeadService, Lead, CreateLeadData } from "@/lib/leadService";
-
-const statusColor = {
-  new: "bg-blue-100 text-blue-700 rounded-lg",
-  contacted: "bg-yellow-100 text-yellow-700 rounded-lg",
-  qualified: "bg-purple-100 text-purple-700 rounded-lg",
-  converted: "bg-green-100 text-green-700 rounded-lg",
-};
-
-const statusLabels = {
-  new: "New",
-  contacted: "Contacted",
-  qualified: "Qualified", 
-  converted: "Converted",
-};
+import ContactForm from '@/components/formcontact';
+import { ContactService, Contact, CreateContactData } from "@/lib/ContactService";
 
 interface AlertState {
   show: boolean;
@@ -30,17 +14,16 @@ interface AlertState {
   message: string;
 }
 
-export default function LeadTable() {
+export default function ContactTable() {
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
-  const [editingLead, setEditingLead] = useState<Lead | null>(null);
+  const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [alert, setAlert] = useState<AlertState>({ show: false, type: 'success', message: '' });
-  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; leadId: number | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; contactId: number | null }>({
     show: false,
-    leadId: null
+    contactId: null
   });
   const perPage = 10;
   const showAlert = (type: 'success' | 'error', message: string) => {
@@ -49,100 +32,98 @@ export default function LeadTable() {
   };
 
 
-  const loadLeads = useCallback(async () => {
+  const loadContacts = useCallback(async () => {
     try {
-      const response = await LeadService.getLeads();
-      setLeads(response.leads);
+      const response = await ContactService.getContacts();
+      setContacts(response.contacts);
     } catch (error) {
       console.error(error);
-      showAlert('error', 'Error while loading leads');
+      showAlert('error', 'Error while loading contacts');
     } 
   }, []);
   useEffect(() => {
-    loadLeads();
-}, [loadLeads]); 
-  // Créer un nouveau lead
-  const handleCreateLead = async (data: CreateLeadData) => {
+    loadContacts();
+}, [loadContacts]); 
+  // Créer un nouveau contact
+  const handleCreateContact = async (data: CreateContactData) => {
     try {
-      await LeadService.createLead(data);
-      showAlert('success', 'Lead created successfully');
+      await ContactService.createContact(data);
+      showAlert('success', 'Contact created successfully');
       setIsOpen(false);
-      loadLeads();
+      loadContacts();
     } catch (error) {
-      console.error('Error creating lead:', error);
-      showAlert('error', 'Error while creatiing lead ');
+      console.error('Error creating contact:', error);
+      showAlert('error', 'Error while creating contact');
       throw error; 
     }
   };
 
-  // Mettre à jour un lead existant
-  const handleUpdateLead = async (data: CreateLeadData) => {
-    if (!editingLead) return;
+  // Mettre à jour un contact existant
+  const handleUpdateContact = async (data: CreateContactData) => {
+    if (!editingContact) return;
     
     try {
-      await LeadService.updateLead(editingLead.id, data);
-      showAlert('success', 'Lead updated successfully');
+      await ContactService.updateContact(editingContact.id, data);
+      showAlert('success', 'Contact updated successfully');
       setIsOpen(false);
-      setEditingLead(null);
-      loadLeads();
+      setEditingContact(null);
+      loadContacts();
     } catch (error) {
-      console.error('Error updating lead:', error);
-      showAlert('error', 'Error while updating lead');
+      console.error('Error updating contact:', error);
+      showAlert('error', 'Error while updating contact');
       throw error;
     }
   };
 
   // Ouvrir le formulaire d'édition
-  const handleEdit = (lead: Lead) => {
-    setEditingLead(lead);
+  const handleEdit = (contact: Contact) => {
+    setEditingContact(contact);
     setIsOpen(true);
   };
 
   // Confirmer la suppression
-  const handleDeleteConfirm = (leadId: number) => {
-    setDeleteConfirm({ show: true, leadId });
+  const handleDeleteConfirm = (contactId: number) => {
+    setDeleteConfirm({ show: true, contactId });
   };
 
   // Supprimer un lead
   const handleDelete = async () => {
-    if (!deleteConfirm.leadId) return;
+    if (!deleteConfirm.contactId) return;
     
     try {
-      await LeadService.deleteLead(deleteConfirm.leadId);
-      showAlert('success', 'Lead deleted successfully');
-      setDeleteConfirm({ show: false, leadId: null });
-      loadLeads();
+      await ContactService.deleteContact(deleteConfirm.contactId);
+      showAlert('success', 'Contact deleted successfully');
+      setDeleteConfirm({ show: false, contactId: null });
+      loadContacts();
     } catch (error) {
-      console.error('Error deleting lead:', error);
-      showAlert('error', 'Error while deleting lead');
+      console.error('Error deleting contact:', error);
+      showAlert('error', 'Error while deleting contact');
     }
   };
 
   // Fermer le formulaire
   const handleCloseForm = () => {
     setIsOpen(false);
-    setEditingLead(null);
+    setEditingContact(null);
   };
   
   // Recherche avec debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      setCurrentPage(1); // Reset à la page 1 lors de la recherche
-      loadLeads();
+      setCurrentPage(1); 
+      loadContacts();
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [search,loadLeads]);
+  }, [search,loadContacts]);
 
-  const filteredLeads = leads.filter(lead =>
-    (lead.name.toLowerCase().includes(search.toLowerCase()) ||
-      lead.email.toLowerCase().includes(search.toLowerCase()) ||
-      (lead.companyName && lead.companyName.toLowerCase().includes(search.toLowerCase()))) &&
-    (statusFilter === "all" || lead.status === statusFilter)
-  );
+  const filteredcontacts = contacts.filter(contact =>
+    (contact.name.toLowerCase().includes(search.toLowerCase()) ||
+      contact.email.toLowerCase().includes(search.toLowerCase()) ||
+      contact.companyName && contact.companyName.toLowerCase().includes(search.toLowerCase())) );
 
-  const paginatedLeads = filteredLeads.slice((currentPage - 1) * perPage, currentPage * perPage);
-  const totalPages = Math.ceil(filteredLeads.length / perPage);
+  const paginatedContacts = filteredcontacts.slice((currentPage - 1) * perPage, currentPage * perPage);
+  const totalPages = Math.ceil(filteredcontacts.length / perPage);
 
   return (
     <div className="w-full overflow-x-auto ">
@@ -180,28 +161,12 @@ export default function LeadTable() {
               className="pl-9 w-90"
             />
           </div>
-          
-          <div className="flex items-center gap-4">
-            <Select onValueChange={(value) => setStatusFilter(value)} value={statusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by:" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value={LeadStatus.new}>New</SelectItem>
-                <SelectItem value={LeadStatus.contacted}>Contacted</SelectItem>
-                <SelectItem value={LeadStatus.qualified}>Qualified</SelectItem>
-                <SelectItem value={LeadStatus.converted}>Converted</SelectItem>
-              </SelectContent>
-            </Select>
-            
             <button 
               onClick={() => setIsOpen(true)} 
-              className='px-4 py-2 text-sm rounded-md bg-[#12284C] text-white font-semibold hover:bg-gray-500 transition duration-200'
-            > 
-              + Add new Lead
+              className='px-4 py-2 text-sm rounded-md bg-[#12284C] text-white font-semibold hover:bg-gray-500 transition duration-200'> 
+              + Add new Contact
             </button>        
-          </div>
+          
         </div>
 
         {/* Modal du formulaire */}
@@ -213,7 +178,7 @@ export default function LeadTable() {
               <button onClick={handleCloseForm} className="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
                 ✕
               </button>
-              <LeadForm initialData={editingLead || undefined} onSubmit={editingLead ? handleUpdateLead : handleCreateLead} isEditing={!!editingLead}/>
+              <ContactForm initialData={editingContact || undefined} onSubmit={editingContact ? handleUpdateContact : handleCreateContact} isEditing={!!editingContact}/>
             </div>
             </div>
           </div>
@@ -226,11 +191,11 @@ export default function LeadTable() {
             <div className="bg-gray-100 p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
               <h3 className="text-lg font-semibold mb-4">Confirm deletion</h3>
               <p className="text-gray-600 mb-6">
-                Are you sure you want to delete the lead? This action is irreversible.
+                Are you sure you want to delete the contact? This action is irreversible.
               </p>
               <div className="flex gap-3 justify-end">
                 <button
-                  onClick={() => setDeleteConfirm({ show: false, leadId: null })}
+                  onClick={() => setDeleteConfirm({ show: false, contactId: null })}
                   className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
                 >
                   Cancel
@@ -254,34 +219,24 @@ export default function LeadTable() {
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
               <TableHead>Company</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Assigned to</TableHead>
               <TableHead>Notes</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedLeads.length > 0 ? (
-              paginatedLeads.map((lead) => (
-                <TableRow key={lead.id}>
-                  <TableCell className="font-medium">{lead.name}</TableCell>
-                  <TableCell>{lead.email}</TableCell>
-                  <TableCell>{lead.phone}</TableCell>
-                  <TableCell>{lead.companyName || '-'}</TableCell>
-                  <TableCell>{lead.source || '-'}</TableCell>
-                  <TableCell>{lead.user?.name || lead.assignedTo || '-'}</TableCell>
-                  <TableCell>{lead.notes || '-'}</TableCell>
-                  <TableCell>
-                    <span className={cn("px-2 py-1 rounded text-sm font-medium", statusColor[lead.status])}>
-                       {statusLabels[lead.status]}
-                    </span>
-                  </TableCell>
+            {paginatedContacts.length > 0 ? (
+              paginatedContacts.map((contact) => (
+                <TableRow key={contact.id}>
+                  <TableCell className="font-medium">{contact.name}</TableCell>
+                  <TableCell>{contact.email}</TableCell>
+                  <TableCell>{contact.phone}</TableCell>
+                  <TableCell>{contact.companyName || '-'}</TableCell>
+                  <TableCell>{contact.notes || '-'}</TableCell>
                   <TableCell className="flex gap-3">
                     <button
                       aria-label="Edit"
                       className="text-green-600 hover:text-green-900"
-                      onClick={() => handleEdit(lead)}
+                      onClick={() => handleEdit(contact)}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -289,7 +244,7 @@ export default function LeadTable() {
                     <button
                       aria-label="Delete"
                       className="text-red-600 hover:text-red-800"
-                      onClick={() => handleDeleteConfirm(lead.id)}
+                      onClick={() => handleDeleteConfirm(contact.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -299,7 +254,7 @@ export default function LeadTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={9} className="text-center text-muted-foreground">
-                  No leads found.
+                  No contacts found.
                 </TableCell>
               </TableRow>
             )}

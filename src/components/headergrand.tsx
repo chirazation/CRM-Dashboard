@@ -2,9 +2,25 @@
 
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
-import { useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react'
+import React, { useEffect, useState } from "react";
 
-export default function Headergrand() {
+export default function RemindersButton() {
+  const [todayCount, setTodayCount] = useState(0);
+
+  useEffect(() => {
+    const fetchTodayReminders = async () => {
+      try {
+        const res = await fetch("/api/reminders/today");
+        const data = await res.json();
+        setTodayCount(data.count || 0);
+      } catch (error) {
+        console.error("Error fetching reminders:", error);
+      }
+    };
+    fetchTodayReminders();
+  }, []);
+
   const { data: session } = useSession();
 
   return (
@@ -20,17 +36,9 @@ export default function Headergrand() {
 
         {/* Search */}
         <div className="flex-1 flex justify-center px-2 sm:px-4 md:px-6 sm:ml-10">
-  <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-    <input
-      type="text"
-      placeholder="Search..."
-      className="w-full pl-10 pr-4 py-2 rounded-3xl border border-gray-300 text-sm"
-    />
-    <div className="absolute left-3 top-2.5 text-gray-500">
-      <Icon icon="lucide:search" className="w-5 h-5" />
-    </div>
-  </div>
-</div>
+         <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
+         </div>
+        </div>
 
         {/* Icons + Hi User */}
         <div className="flex items-center gap-2">
@@ -48,9 +56,15 @@ export default function Headergrand() {
             <Icon icon="lucide:settings" className="w-5 h-5 text-[#0a1f44]" />
           </button>
           <Link href="/dashboardgrand/reminders">
-          <button onClick={() => alert('Notifications clicked!')} className="hover:bg-gray-200 p-2 rounded-full" aria-label="Notifications">
-            <Icon icon="mdi:bell" className="w-5 h-5 text-[#0a1f44]" />
-          </button>
+         <button className="relative hover:bg-gray-200 p-2 rounded-full" aria-label="Notifications">
+           <Icon icon="mdi:bell" className="w-5 h-5 text-[#0a1f44]" />
+            {todayCount > 0 && (
+              <span className="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-3 h-3 flex items-center justify-center">
+                {todayCount}
+             </span>
+            )}
+         </button>
+
           </Link>
           <Link href="/dashboardgrand/profile">
           <button onClick={() => alert('Profile clicked!')} className="hover:bg-gray-200 p-2 rounded-full" aria-label="Profile">

@@ -65,50 +65,50 @@ export default function CalendarTabs({ reminders , events} : Props) {
   };
 
   return (
-    <div className="flex min-h-screen p-4 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 justify-center items-center">
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-lg overflow-hidden border border-white/30 w-full max-w-lg transition-all duration-300 hover:shadow-xl">
-        
-        {/* Header Section */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-6 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
-          <div className="relative text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-white/15 backdrop-blur-md rounded-xl mb-3 shadow-inner">
-              <span className="text-2xl font-bold">{dayNum}</span>
-            </div>
-            <h2 className="text-2xl font-semibold mb-1 tracking-wide">{month}</h2>
-            <p className="text-slate-300 text-sm font-medium">{day}</p>
+    <div className="w-full h-full flex flex-col overflow-y-auto">
+      
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-6 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10"></div>
+        <div className="relative text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-white/15 backdrop-blur-md rounded-xl mb-3 shadow-inner">
+            <span className="text-2xl font-bold">{dayNum}</span>
           </div>
+          <h2 className="text-2xl font-semibold mb-1 tracking-wide">{month}</h2>
+          <p className="text-slate-300 text-sm font-medium">{day}</p>
         </div>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="px-4 py-4 bg-gray-50/70">
-          <div className="flex gap-1 p-1 bg-gray-100 rounded-xl shadow-inner" role="group">
-            {tabs.map((tab) => {
-              const Icon = tabIcons[tab];
-              return (
-                <button
-                  key={tab}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
-                    activeTab === tab
-                      ? 'bg-white text-slate-800 shadow-md transform scale-[1.03]'
-                      : 'text-gray-600 hover:text-slate-700 hover:bg-white/40'
-                  }`}
-                  onClick={() => setActiveTab(tab)}
-                >
-                  <Icon size={16} />
-                  <span>{tab}</span>
-                </button>
-              );
-            })}
-          </div>
+      {/* Tab Navigation */}
+      <div className="px-4 py-4 bg-gray-50/70">
+        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl shadow-inner" role="group">
+          {tabs.map((tab) => {
+            const Icon = tabIcons[tab];
+            return (
+              <button
+                key={tab}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
+                  activeTab === tab
+                    ? 'bg-white text-slate-800 shadow-md transform scale-[1.03]'
+                    : 'text-gray-600 hover:text-slate-700 hover:bg-white/40'
+                }`}
+                onClick={() => setActiveTab(tab)}
+              >
+                <Icon size={16} />
+                <span>{tab}</span>
+              </button>
+            );
+          })}
         </div>
+      </div>
 
-        {/* Content Section */}
-        <div className="px-4 pb-4 overflow-y-auto">
-          <div className="min-h-[160px] mb-4">
-            {activeTab === 'Events' ? (
-              <div className="bg-gray-50/80 rounded-xl min-h-[160px] p-2 shadow-inner">
-                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+      {/* Content Section - Takes remaining space */}
+      <div className="flex-1 px-4 pb-4 flex flex-col min-h-0">
+        <div className="flex-1 mb-4 min-h-0">
+          {activeTab === 'Events' ? (
+            <div className="bg-gray-50/80 rounded-xl h-full p-4 shadow-inner">
+              <div className="h-full overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3">
                   {events.map((event) => (
                     <EventCard 
                       key={event.id}
@@ -121,9 +121,11 @@ export default function CalendarTabs({ reminders , events} : Props) {
                   ))}
                 </div>
               </div>
-            ) : (
-              <div className="bg-gray-50/80 rounded-xl min-h-[160px] p-2 shadow-inner">
-                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+            </div>
+          ) : (
+            <div className="bg-gray-50/80 rounded-xl h-full p-4 shadow-inner">
+              <div className="h-full overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3">
                   {reminders.map((reminder) => (
                     <ReminderCard 
                       key={reminder.id}
@@ -136,18 +138,18 @@ export default function CalendarTabs({ reminders , events} : Props) {
                   ))}
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Add Button */}
-          <button
-            className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${buttonConfig[activeTab].gradient}`}
-            onClick={() => setShowForm(true)}
-          >
-            <Plus size={16} />
-            {buttonConfig[activeTab].text}
-          </button>
+            </div>
+          )}
         </div>
+
+        {/* Add Button */}
+        <button
+          className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg ${buttonConfig[activeTab].gradient}`}
+          onClick={() => setShowForm(true)}
+        >
+          <Plus size={16} />
+          {buttonConfig[activeTab].text}
+        </button>
       </div>
 
       {/* Modal */}

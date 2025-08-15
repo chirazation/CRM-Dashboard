@@ -10,13 +10,8 @@ const features = [
     icon: <CheckCircle className="text-green-500 w-6 h-6" />,
   },
   {
-    title: 'Gestion des contacts',
-    description: 'Centralisez toutes les informations de vos clients et prospects.',
-    icon: <CheckCircle className="text-green-500 w-6 h-6" />,
-  },
-  {
-    title: 'Suivi des entreprises',
-    description: 'Associez plusieurs contacts à une même entreprise facilement.',
+    title: 'Gestion des Contacts',
+    description: 'Ajoutez et modifier des contacts.',
     icon: <CheckCircle className="text-green-500 w-6 h-6" />,
   },
   {
@@ -34,16 +29,7 @@ const features = [
     description: 'Gérez les autorisations selon les rôles : admin, sales, viewer.',
     icon: <CheckCircle className="text-green-500 w-6 h-6" />,
   },
-  {
-    title: 'Export de données',
-    description: 'Exportez vos leads et contacts en formats CSV ou Excel.',
-    icon: <CheckCircle className="text-green-500 w-6 h-6" />,
-  },
-  {
-    title: 'Notifications par e-mail',
-    description: 'Recevez automatiquement des rappels dans votre boîte mail.',
-    icon: <CheckCircle className="text-green-500 w-6 h-6" />,
-  },
+  
 ];
 
 export default function FeaturesPage() {
@@ -61,7 +47,7 @@ export default function FeaturesPage() {
         </p>
       </div>
 
-      <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
         {features.map((feature, index) => (
           <div key={index} className="flex items-start space-x-4">
             {feature.icon}
@@ -75,9 +61,8 @@ export default function FeaturesPage() {
 
       <div className="mt-16 text-center">
         <Link
-          href="/signup"
-          className="inline-block bg-[#0A1F44] text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition"
-        >
+          href="/auth/login"
+          className="inline-block bg-[#0A1F44] text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition">
           Commencer maintenant
         </Link>
       </div>

@@ -5,6 +5,7 @@ const TopCards =() =>{
       const [counts, setCounts] = useState({
         totalLeads: 0,
         companyCount: 0,
+        totalcontacts: 0 ,
       });
     
       useEffect(() => {
@@ -29,7 +30,7 @@ const TopCards =() =>{
                 <Icon icon="lucide:users" className="w-6 h-6 text-blue-800 bg-blue-200 p-1 rounded-lg"></Icon>
                 <span className='text-lg font-medium text-gray-600 mb-1 '>Number of contacts</span>   
             </div>
-            <div className="text-xl font-bold text-gray-900 mt-2 ml-8 group-hover:text-white">{counts.totalLeads}</div>
+            <div className="text-xl font-bold text-gray-900 mt-2 ml-8 group-hover:text-white">{counts.totalcontacts}</div>
         </div>
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
              <div className='flex w-full pb-4 gap-2.5'>

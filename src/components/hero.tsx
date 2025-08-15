@@ -45,7 +45,7 @@ export const Hero = () => {
             </Link>
           </div>
 
-          {/* ▶️ Video Demo Button */}
+          {/* Video Demo Button */}
           <div className="mt-6">
             <button className="flex items-center gap-2 text-white hover:text-blue-300 transition">
               <Icon icon="mdi:play-circle-outline" className="text-2xl" />

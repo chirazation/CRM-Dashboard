@@ -9,7 +9,7 @@ import { signOut } from 'next-auth/react';
 
 const SideNav = () => {
   return (
-    <div className="w-50 hidden md:flex flex-col justify-between bg-[#F9FAFB] border-r border-zinc-200 shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out">
+    <div className="w-50 hidden md:flex flex-col justify-between bg-[#F9FAFB] border-r border-zinc-200 font-medium shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out">
         <div>
           <div className="flex flex-col space-y-2 md:px-6 mt-5">
             {SIDENAV_ITEMS.map((item, idx: number) => (

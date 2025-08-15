@@ -26,6 +26,13 @@ export default function Sidebar2() {
           <Icon icon="lucide:users-round" className="w-5 h-5 text-white" />
         </button>
         </Link>
+
+          <Link href={"/dashboardgrand/contacts"}>
+        <button className="hover:bg-gray-200 p-2 rounded" aria-label="leads">
+          <Icon icon="mdi:book-open-page-variant-outline" className="w-5 h-5 text-white" />
+        </button>
+        </Link>
+
         <Link href={"/dashboardgrand/reminders"}>
         <button className="hover:bg-gray-200 p-2 rounded" aria-label="reminders">
           <Icon icon="lucide:alarm-clock" className="w-5 h-5 text-white" />
