@@ -3,7 +3,7 @@
 import * as React from "react";
 import { CalendarDays, AlarmClock } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card,CardContent } from "@/components/ui/card";
 
 type EventType = {
   id: number;
@@ -71,7 +71,7 @@ export function Calendar17() {
           <div className="mt-6 bg-white/70 backdrop-blur-md shadow-md rounded-2xl p-5 border border-gray-200/50 overflow-y-auto max-h-62 transition-all duration-300">
             {/* Events Section */}
             <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <CalendarDays className="w-5 h-5 text-blue-600" />
+              <CalendarDays className="w-4 h-4 text-blue-600" />
               Events
             </h3>
             {events.length === 0 ? (
@@ -92,7 +92,7 @@ export function Calendar17() {
 
             {/* Reminders Section */}
             <h3 className="text-lg font-semibold text-emerald-700 mt-6 flex items-center gap-2">
-              <AlarmClock className="w-5 h-5 text-emerald-500" />
+              <AlarmClock className="w-4 h-4 text-emerald-500" />
               Reminders
             </h3>
             {reminders.length === 0 ? (
